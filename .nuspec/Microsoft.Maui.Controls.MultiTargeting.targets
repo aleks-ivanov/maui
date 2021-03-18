@@ -85,6 +85,6 @@
     <NoWarn>$(NoWarn);NU5104</NoWarn>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net5.0-windows')) == true">
-    <PackageReference Include="Microsoft.WinUI" Version="3.0.0-preview3.201113.0" />
+    <PackageReference Include="Microsoft.WinUI" Version="3.0.0-preview4.210210.4" />
   </ItemGroup>
 </Project>
