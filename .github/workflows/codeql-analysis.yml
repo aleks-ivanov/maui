@@ -21,6 +21,12 @@ jobs:
         id: init_codeql
         uses: github/codeql-action/init@v1
 
+      - name: NuGet restore
+        id: nuget_restore
+        shell: pwsh
+        run: |
+          nuget restore $env:SOLUTION_PATH
+
       - name: Build application
         id: build_app
         shell: pwsh
