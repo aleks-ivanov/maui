@@ -10,6 +10,8 @@ jobs:
   analyze:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
+    env:
+      SOLUTION_PATH: Microsoft.Maui.sln
     steps:
       - name: Checkout repository
         id: checkout_repo
@@ -19,8 +21,11 @@ jobs:
         id: init_codeql
         uses: github/codeql-action/init@v1
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v1
+      - name: Build application
+        id: build_app
+        shell: pwsh
+        run: |
+          dotnet build $env:SOLUTION_PATH
 
       - name: Perform CodeQL Analysis
         id: analyze_codeql
