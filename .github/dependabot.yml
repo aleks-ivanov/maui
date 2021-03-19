@@ -9,7 +9,7 @@ updates:
 
   - package-ecosystem: "nuget"
     # location of package manifests
-    directory: "/**;!/**/*Tests*/**/<anything>.(cs|vb|fs)proj"
+    directory: "/**;!/**/*Test*.csproj"
     open-pull-requests-limit: 10
     schedule:
       interval: "daily"
