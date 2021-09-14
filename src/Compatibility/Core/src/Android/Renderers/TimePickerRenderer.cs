@@ -6,6 +6,7 @@ using Android.Content;
 using Android.Text.Format;
 using Android.Util;
 using Android.Widget;
+using Microsoft.Maui.Controls.Platform;
 using ATimePicker = Android.Widget.TimePicker;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
@@ -16,6 +17,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 		AlertDialog _dialog;
 		bool _disposed;
 
+		[PortHandler]
 		bool Is24HourView
 		{
 			get => (DateFormat.Is24HourFormat(Context) && Element.Format == (string)TimePicker.FormatProperty.DefaultValue) || Element.Format?.Contains('H') == true;
@@ -154,6 +156,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			Element.Unfocus();
 		}
 
+		[PortHandler]
 		void SetTime(TimeSpan time)
 		{
 			if (String.IsNullOrEmpty(Element.Format))
@@ -170,12 +173,14 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			Element.InvalidateMeasureNonVirtual(Internals.InvalidationTrigger.MeasureChanged);
 		}
 
+		[PortHandler]
 		void UpdateFont()
 		{
 			EditText.Typeface = Element.ToTypeface();
 			EditText.SetTextSize(ComplexUnitType.Sp, (float)Element.FontSize);
 		}
 
+		[PortHandler]
 		void UpdateCharacterSpacing()
 		{
 			if (Forms.IsLollipopOrNewer)
@@ -184,6 +189,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			}
 		}
 
+		[PortHandler]
 		abstract protected void UpdateTextColor();
 	}
 
@@ -201,6 +207,8 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 		}
 
 		protected override EditText EditText => Control;
+
+		[PortHandler]
 		protected override void UpdateTextColor()
 		{
 			_textColorSwitcher = _textColorSwitcher ?? new TextColorSwitcher(EditText.TextColors, Element.UseLegacyColorManagement());

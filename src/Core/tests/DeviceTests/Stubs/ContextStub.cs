@@ -1,31 +1,35 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Maui.Animations;
 
 namespace Microsoft.Maui.DeviceTests.Stubs
 {
-	class ContextStub : IMauiContext, IDisposable
+	class ContextStub : IMauiContext, IScopedMauiContext
 	{
-		AppStub _app;
-
-		public ContextStub(AppStub app)
+		IAnimationManager _manager;
+		public ContextStub(IServiceProvider services)
 		{
-			_app = app;
+			Services = services;
 		}
 
-		public IServiceProvider Services =>
-			_app.Services;
+		public IServiceProvider Services { get; }
 
 		public IMauiHandlersServiceProvider Handlers =>
 			Services.GetRequiredService<IMauiHandlersServiceProvider>();
 
-#if __ANDROID__
-		public Android.Content.Context Context =>
-			Android.App.Application.Context;
-#endif
+		public IAnimationManager AnimationManager =>
+			_manager ??= Services.GetRequiredService<IAnimationManager>();
 
-		public void Dispose()
-		{
-			_app = null;
-		}
+#if __ANDROID__
+		public Android.Content.Context Context => Platform.DefaultContext;
+
+		public Android.Views.LayoutInflater LayoutInflater => null;
+
+		public AndroidX.Fragment.App.FragmentManager FragmentManager => null;
+#elif __IOS__
+		public UIKit.UIWindow Window => UIKit.UIApplication.SharedApplication.GetKeyWindow();
+#elif WINDOWS
+		public UI.Xaml.Window Window => throw new NotImplementedException();
+#endif
 	}
 }

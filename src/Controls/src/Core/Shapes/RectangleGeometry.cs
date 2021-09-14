@@ -1,3 +1,4 @@
+using Rect = Microsoft.Maui.Graphics.Rectangle;
 namespace Microsoft.Maui.Controls.Shapes
 {
 	public class RectangleGeometry : Geometry
@@ -19,6 +20,11 @@ namespace Microsoft.Maui.Controls.Shapes
 		{
 			set { SetValue(RectProperty, value); }
 			get { return (Rect)GetValue(RectProperty); }
+		}
+
+		public override void AppendPath(Graphics.PathF path)
+		{
+			path.AppendRectangle(Rect);
 		}
 	}
 }

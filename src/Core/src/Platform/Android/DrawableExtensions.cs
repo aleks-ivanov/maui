@@ -1,6 +1,5 @@
 using System;
 using Android.Graphics;
-using Microsoft.Maui;
 using AColor = Android.Graphics.Color;
 using AColorFilter = Android.Graphics.ColorFilter;
 using ADrawable = Android.Graphics.Drawables.Drawable;
@@ -61,18 +60,18 @@ namespace Microsoft.Maui
 		}
 
 
-		public static void SetColorFilter(this ADrawable drawable, Maui.Color color, FilterMode mode, AColorFilter? defaultColorFilter)
+		public static void SetColorFilter(this ADrawable drawable, Graphics.Color color, FilterMode mode, AColorFilter? defaultColorFilter)
 		{
 			if (drawable == null)
 				return;
 
-			if (color == Maui.Color.Default)
+			if (color == null)
 				SetColorFilter(drawable, defaultColorFilter);
 			else
 				drawable.SetColorFilter(color.ToNative(), mode);
 		}
 
-		public static void SetColorFilter(this ADrawable drawable, Maui.Color color, FilterMode mode)
+		public static void SetColorFilter(this ADrawable drawable, Graphics.Color color, FilterMode mode)
 		{
 			if (drawable == null)
 				return;

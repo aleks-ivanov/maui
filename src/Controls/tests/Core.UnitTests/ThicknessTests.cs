@@ -1,6 +1,8 @@
 using System;
 using System.Globalization;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.Maui.Converters;
+using Microsoft.Maui.Graphics;
 using NUnit.Framework;
 
 

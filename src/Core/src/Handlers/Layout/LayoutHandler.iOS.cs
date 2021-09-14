@@ -1,14 +1,10 @@
 using System;
-
-#if __IOS__ || IOS || MACCATALYST
+using UIKit;
 using NativeView = UIKit.UIView;
-#else
-using NativeView = AppKit.NSView;
-#endif
 
 namespace Microsoft.Maui.Handlers
 {
-	public partial class LayoutHandler : AbstractViewHandler<ILayout, LayoutView>
+	public partial class LayoutHandler : ViewHandler<ILayout, LayoutView>
 	{
 		protected override LayoutView CreateNativeView()
 		{
@@ -19,8 +15,8 @@ namespace Microsoft.Maui.Handlers
 
 			var view = new LayoutView
 			{
-				CrossPlatformMeasure = VirtualView.Measure,
-				CrossPlatformArrange = VirtualView.Arrange,
+				CrossPlatformMeasure = VirtualView.CrossPlatformMeasure,
+				CrossPlatformArrange = VirtualView.CrossPlatformArrange,
 			};
 
 			return view;
@@ -30,39 +26,73 @@ namespace Microsoft.Maui.Handlers
 		{
 			base.SetVirtualView(view);
 
-			_ = TypedNativeView ?? throw new InvalidOperationException($"{nameof(TypedNativeView)} should have been set by base class.");
+			_ = NativeView ?? throw new InvalidOperationException($"{nameof(NativeView)} should have been set by base class.");
 			_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} should have been set by base class.");
-			_ = MauiApp.Current?.Context ?? throw new InvalidOperationException($"The MauiApp.Current.Context can't be null.");
+			_ = MauiContext ?? throw new InvalidOperationException($"{nameof(MauiContext)} should have been set by base class.");
 
-			TypedNativeView.CrossPlatformMeasure = VirtualView.Measure;
-			TypedNativeView.CrossPlatformArrange = VirtualView.Arrange;
+			NativeView.View = view;
+			NativeView.CrossPlatformMeasure = VirtualView.CrossPlatformMeasure;
+			NativeView.CrossPlatformArrange = VirtualView.CrossPlatformArrange;
 
-			foreach (var child in VirtualView.Children)
+			// Remove any previous children 
+			NativeView.ClearSubviews();
+
+			foreach (var child in VirtualView)
 			{
-				TypedNativeView.AddSubview(child.ToNative(MauiApp.Current.Context));
+				NativeView.AddSubview(child.ToNative(MauiContext));
 			}
 		}
 
 		public void Add(IView child)
 		{
-			_ = TypedNativeView ?? throw new InvalidOperationException($"{nameof(TypedNativeView)} should have been set by base class.");
+			_ = NativeView ?? throw new InvalidOperationException($"{nameof(NativeView)} should have been set by base class.");
 			_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} should have been set by base class.");
-			_ = MauiApp.Current?.Context ?? throw new InvalidOperationException($"The MauiApp.Current.Context can't be null.");
+			_ = MauiContext ?? throw new InvalidOperationException($"{nameof(MauiContext)} should have been set by base class.");
 
-			TypedNativeView.AddSubview(child.ToNative(MauiApp.Current.Context));
-			TypedNativeView.SetNeedsLayout();
+			NativeView.AddSubview(child.ToNative(MauiContext));
 		}
 
 		public void Remove(IView child)
 		{
-			_ = TypedNativeView ?? throw new InvalidOperationException($"{nameof(TypedNativeView)} should have been set by base class.");
+			_ = NativeView ?? throw new InvalidOperationException($"{nameof(NativeView)} should have been set by base class.");
 			_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} should have been set by base class.");
 
-			if (child?.Handler?.NativeView is NativeView nativeView)
+			if (child?.Handler?.NativeView is NativeView childView)
 			{
-				nativeView.RemoveFromSuperview();
-				TypedNativeView.SetNeedsLayout();
+				childView.RemoveFromSuperview();
 			}
+		}
+
+		public void Clear()
+		{
+			NativeView.ClearSubviews();
+		}
+
+		public void Insert(int index, IView child)
+		{
+			_ = NativeView ?? throw new InvalidOperationException($"{nameof(NativeView)} should have been set by base class.");
+			_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} should have been set by base class.");
+			_ = MauiContext ?? throw new InvalidOperationException($"{nameof(MauiContext)} should have been set by base class.");
+
+			NativeView.InsertSubview(child.ToNative(MauiContext), index);
+		}
+
+		public void Update(int index, IView child)
+		{
+			_ = NativeView ?? throw new InvalidOperationException($"{nameof(NativeView)} should have been set by base class.");
+			_ = VirtualView ?? throw new InvalidOperationException($"{nameof(VirtualView)} should have been set by base class.");
+			_ = MauiContext ?? throw new InvalidOperationException($"{nameof(MauiContext)} should have been set by base class.");
+
+			var existing = NativeView.Subviews[index];
+			existing.RemoveFromSuperview();
+			NativeView.InsertSubview(child.ToNative(MauiContext), index);
+			NativeView.SetNeedsLayout();
+		}
+
+		protected override void DisconnectHandler(LayoutView nativeView)
+		{
+			base.DisconnectHandler(nativeView);
+			nativeView.ClearSubviews();
 		}
 	}
 }

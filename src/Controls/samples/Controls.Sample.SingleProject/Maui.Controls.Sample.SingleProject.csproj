@@ -1,38 +1,58 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
   <PropertyGroup>
-    <TargetFrameworks>net6.0-android;net6.0-ios</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT'">$(TargetFrameworks);net6.0-maccatalyst</TargetFrameworks>
-    <RuntimeIdentifier Condition="'$(TargetFramework)' == 'net6.0-ios'">ios-x64</RuntimeIdentifier>
-    <RuntimeIdentifier Condition="'$(TargetFramework)' == 'net6.0-maccatalyst'">maccatalyst-x64</RuntimeIdentifier>
+    <TargetFrameworks>$(MauiPlatforms)</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <SingleProject>true</SingleProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <ApplicationTitle>Single Project</ApplicationTitle>
     <ApplicationId>com.microsoft.maui.singleproject</ApplicationId>
     <ApplicationVersion>1.0</ApplicationVersion>
     <AndroidVersionCode>1</AndroidVersionCode>
-    <IsPackable>false</IsPackable>
   </PropertyGroup>
-  <ItemGroup>
+
+  <PropertyGroup>
+    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+    <WindowsPackageType>MSIX</WindowsPackageType>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(UseMaui)' != 'true' and $(TargetFramework.Contains('-windows')) ">
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.Foundation" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" />
+    <PackageReference Include="Microsoft.Graphics.Win2D" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(UseMaui)' != 'true' ">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(UseMaui)' != 'true' ">
     <ProjectReference Include="..\..\..\Compatibility\Core\src\Compatibility-net6.csproj" />
     <ProjectReference Include="..\..\..\Core\src\Core-net6.csproj" />
+    <ProjectReference Include="..\..\src\Xaml\Controls.Xaml-net6.csproj" />
     <ProjectReference Include="..\..\src\Core\Controls.Core-net6.csproj" />
+    <ProjectReference Include="..\..\..\BlazorWebView\src\Maui\Microsoft.AspNetCore.Components.WebView.Maui.csproj" />
   </ItemGroup>
-  <!--
-    The linker resolves some assembly references too eagerly, and
-    fails when it can't find them, so work around this by referencing
-    the missing assemblies.
-    See: https://github.com/mono/linker/issues/1139
-  -->
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net6.0-android' ">
-    <_DotNetPackageVersion>5.0.0</_DotNetPackageVersion>
+
+  <ItemGroup>
+    <MauiImage Include="Resources\AppIcons\appicon.svg" ForegroundFile="Resources\AppIcons\appicon_foreground.svg" IsAppIcon="true" />
+    <MauiAsset Include="Resources\Raw\*" Link="%(Filename)%(Extension)" />
+    <MauiSplashScreen Include="Resources\AppIcons\appicon_foreground.svg" Color="#FF69B4" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
+    <!-- Required - WinUI can't deploy in a multi-targeting environment -->
+    <OutputType>WinExe</OutputType>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0-android' ">
-    <PackageReference Include="System.CodeDom"                        Version="$(_DotNetPackageVersion)" />
-    <PackageReference Include="System.Diagnostics.EventLog"           Version="$(_DotNetPackageVersion)" />
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="$(_DotNetPackageVersion)" />
-    <PackageReference Include="System.IO.Ports"                       Version="$(_DotNetPackageVersion)" />
-    <PackageReference Include="System.Security.Permissions"           Version="$(_DotNetPackageVersion)" />
-    <PackageReference Include="System.Threading.AccessControl"        Version="$(_DotNetPackageVersion)" />
+  <ItemGroup>
+    <Content Remove="Properties\launchSettings.json" />
   </ItemGroup>
+
+  <Import Condition=" '$(UseMaui)' != 'true' " Project="..\..\..\BlazorWebView\src\Maui\build\Microsoft.AspNetCore.Components.WebView.Maui.targets" />
+
 </Project>

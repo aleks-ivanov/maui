@@ -8,6 +8,7 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
 using AListView = Android.Widget.ListView;
 using AView = Android.Views.View;
 
@@ -63,7 +64,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			realListView.OnItemClickListener = this;
 			realListView.OnItemLongClickListener = this;
 
-			MessagingCenter.Subscribe<ListViewAdapter>(this, AppCompat.Platform.CloseContextActionsSignalName, lva => CloseContextActions());
+			MessagingCenter.Subscribe<ListViewAdapter>(this, Platform.CloseContextActionsSignalName, lva => CloseContextActions());
 
 			InvalidateCount();
 		}
@@ -435,7 +436,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			{
 				CloseContextActions();
 
-				MessagingCenter.Unsubscribe<ListViewAdapter>(this, AppCompat.Platform.CloseContextActionsSignalName);
+				MessagingCenter.Unsubscribe<ListViewAdapter>(this, Platform.CloseContextActionsSignalName);
 
 				_realListView.OnItemClickListener = null;
 				_realListView.OnItemLongClickListener = null;
@@ -514,10 +515,10 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 
 			if (view != null)
 			{
-				var renderer = AppCompat.Platform.GetRenderer(view);
+				var renderer = Platform.GetRenderer(view);
 
 				if (renderer == renderedView)
-					element.ClearValue(AppCompat.Platform.RendererProperty);
+					element.ClearValue(Platform.RendererProperty);
 
 				renderer?.Dispose();
 				renderer = null;
@@ -697,8 +698,8 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 
 			Color separatorColor = _listView.SeparatorColor;
 
-			if (isHeader || !separatorColor.IsDefault)
-				bline.SetBackgroundColor(separatorColor.ToAndroid(Color.Accent));
+			if (isHeader || separatorColor != null)
+				bline.SetBackgroundColor(separatorColor.ToAndroid(Application.AccentColor));
 			else
 			{
 				if (s_dividerHorizontalDarkId == int.MinValue)

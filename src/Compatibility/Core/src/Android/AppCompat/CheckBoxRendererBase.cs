@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using Android.Content;
 using Android.Content.Res;
@@ -9,9 +9,12 @@ using AndroidX.AppCompat.Widget;
 using AndroidX.Core.Widget;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android.FastRenderers;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Graphics;
 using AAttribute = Android.Resource.Attribute;
 using AColor = Android.Graphics.Color;
 using AView = Android.Views.View;
+using Color = Microsoft.Maui.Graphics.Color;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 {
@@ -29,6 +32,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 		IPlatformElementConfiguration<PlatformConfiguration.Android, CheckBox> _platformElementConfiguration;
 		CheckBox _checkBox;
 
+		[PortHandler]
 		static int[][] _checkedStates = new int[][]
 					{
 						new int[] { AAttribute.StateEnabled, AAttribute.StateChecked },
@@ -72,9 +76,9 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 				{
 					Element.PropertyChanged -= OnElementPropertyChanged;
 
-					if (AppCompat.Platform.GetRenderer(Element) == this)
+					if (Platform.GetRenderer(Element) == this)
 					{
-						Element.ClearValue(AppCompat.Platform.RendererProperty);
+						Element.ClearValue(Platform.RendererProperty);
 					}
 
 					Element = null;
@@ -185,6 +189,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			((IElementController)Element).SetValueFromRenderer(CheckBox.IsCheckedProperty, isChecked);
 		}
 
+		[PortHandler]
 		void UpdateIsChecked()
 		{
 			if (Element == null || Control == null)
@@ -195,7 +200,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 
 		protected virtual ColorStateList GetColorStateList()
 		{
-			var tintColor = Element.Color == Color.Default ? Color.Accent.ToAndroid() : Element.Color.ToAndroid();
+			var tintColor = Element.Color == null ? Application.AccentColor.ToAndroid() : Element.Color.ToAndroid();
 
 			var list = new ColorStateList(
 					_checkedStates,
@@ -210,9 +215,10 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			return list;
 		}
 
+		[PortHandler]
 		void UpdateBackgroundColor()
 		{
-			if (Element.BackgroundColor == Color.Default)
+			if (Element.BackgroundColor == null)
 				SetBackgroundColor(AColor.Transparent);
 			else
 				SetBackgroundColor(Element.BackgroundColor.ToAndroid());
@@ -225,6 +231,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			this.UpdateBackground(background);
 		}
 
+		[PortHandler]
 		void UpdateOnColor()
 		{
 			if (Element == null || Control == null)
@@ -261,7 +268,6 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 		void IVisualElementRenderer.UpdateLayout() => _tracker?.UpdateLayout();
 		VisualElement IVisualElementRenderer.Element => Element;
 		AView IVisualElementRenderer.View => this;
-		ViewGroup IVisualElementRenderer.ViewGroup => null;
 		VisualElementTracker IVisualElementRenderer.Tracker => _tracker;
 
 		protected CheckBox Element

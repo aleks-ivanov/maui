@@ -17,12 +17,15 @@ using AndroidX.AppCompat.App;
 using AndroidX.AppCompat.Graphics.Drawable;
 using AndroidX.DrawerLayout.Widget;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Graphics;
 using static Android.Views.View;
 using static Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific.AppCompat.NavigationPage;
 using ActionBarDrawerToggle = AndroidX.AppCompat.App.ActionBarDrawerToggle;
-using APlatform = Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat.Platform;
+using APlatform = Microsoft.Maui.Controls.Compatibility.Platform.Android.Platform;
 using AToolbar = AndroidX.AppCompat.Widget.Toolbar;
 using AView = Android.Views.View;
+using Color = Microsoft.Maui.Graphics.Color;
 using Fragment = AndroidX.Fragment.App.Fragment;
 using FragmentManager = AndroidX.Fragment.App.FragmentManager;
 using FragmentTransaction = AndroidX.Fragment.App.FragmentTransaction;
@@ -341,16 +344,8 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat
 					_toolbarTracker.CollectionChanged += ToolbarTrackerOnCollectionChanged;
 				}
 
-				var parents = new List<Page>();
-				Page root = Element;
-				while (!Application.IsApplicationOrNull(root.RealParent))
-				{
-					root = (Page)root.RealParent;
-					parents.Add(root);
-				}
-
 				_toolbarTracker.Target = e.NewElement;
-				_toolbarTracker.AdditionalTargets = parents;
+				_toolbarTracker.AdditionalTargets = Element.GetParentPages();
 				UpdateMenu();
 
 				var navController = (INavigationPageController)e.NewElement;
@@ -660,7 +655,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat
 
 			_drawerLayout = renderer;
 
-			FastRenderers.AutomationPropertiesProvider.GetDrawerAccessibilityResources(context, _flyoutPage, out int resourceIdOpen, out int resourceIdClose);
+			Controls.Platform.AutomationPropertiesProvider.GetDrawerAccessibilityResources(context, _flyoutPage, out int resourceIdOpen, out int resourceIdClose);
 
 			if (_drawerToggle != null)
 			{
@@ -915,18 +910,18 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat
 
 			_currentMenuItems.Clear();
 			_currentMenuItems = new List<IMenuItem>();
-			_toolbar.UpdateMenuItems(_toolbarTracker?.ToolbarItems, Context, null, OnToolbarItemPropertyChanged, _currentMenuItems, _currentToolbarItems, UpdateMenuItemIcon);
+			_toolbar.UpdateMenuItems(_toolbarTracker?.ToolbarItems, Element.FindMauiContext(), null, OnToolbarItemPropertyChanged, _currentMenuItems, _currentToolbarItems, UpdateMenuItemIcon);
 		}
 
 		protected virtual void OnToolbarItemPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			var items = _toolbarTracker?.ToolbarItems?.ToList();
-			_toolbar.OnToolbarItemPropertyChanged(e, (ToolbarItem)sender, items, Context, null, OnToolbarItemPropertyChanged, _currentMenuItems, _currentToolbarItems, UpdateMenuItemIcon);
+			_toolbar.OnToolbarItemPropertyChanged(e, (ToolbarItem)sender, items, Element.FindMauiContext(), null, OnToolbarItemPropertyChanged, _currentMenuItems, _currentToolbarItems, UpdateMenuItemIcon);
 		}
 
 		protected virtual void UpdateMenuItemIcon(Context context, IMenuItem menuItem, ToolbarItem toolBarItem)
 		{
-			ToolbarExtensions.UpdateMenuItemIcon(context, menuItem, toolBarItem, null);
+			ToolbarExtensions.UpdateMenuItemIcon(Element.FindMauiContext(), menuItem, toolBarItem, null);
 		}
 
 		void UpdateToolbar()
@@ -947,7 +942,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat
 
 			if (isNavigated)
 			{
-				if (NavigationPage.GetHasBackButton(currentPage) && !Context.IsDesignerContext())
+				if (NavigationPage.GetHasBackButton(currentPage))
 				{
 					if (toggle != null)
 					{
@@ -955,8 +950,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat
 						toggle.SyncState();
 					}
 
-					var activity = (AppCompatActivity)context.GetActivity();
-					var icon = new DrawerArrowDrawable(activity.SupportActionBar.ThemedContext);
+					var icon = new DrawerArrowDrawable(context.GetThemedContext());
 					icon.Progress = 1;
 					bar.NavigationIcon = icon;
 
@@ -983,42 +977,28 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat
 
 			Color tintColor = Element.BarBackgroundColor;
 
-			if (Forms.IsLollipopOrNewer)
-			{
-				if (tintColor.IsDefault)
-					bar.BackgroundTintMode = null;
-				else
-				{
-					bar.BackgroundTintMode = PorterDuff.Mode.Src;
-					bar.BackgroundTintList = ColorStateList.ValueOf(tintColor.ToAndroid());
-				}
-			}
+			if (tintColor == null)
+				bar.BackgroundTintMode = null;
 			else
 			{
-				if (tintColor.IsDefault && _backgroundDrawable != null)
-					bar.SetBackground(_backgroundDrawable);
-				else if (!tintColor.IsDefault)
-				{
-					if (_backgroundDrawable == null)
-						_backgroundDrawable = bar.Background;
-					bar.SetBackgroundColor(tintColor.ToAndroid());
-				}
+				bar.BackgroundTintMode = PorterDuff.Mode.Src;
+				bar.BackgroundTintList = ColorStateList.ValueOf(tintColor.ToAndroid());
 			}
 
 			Brush barBackground = Element.BarBackground;
 			bar.UpdateBackground(barBackground);
 
 			Color textColor = Element.BarTextColor;
-			if (!textColor.IsDefault)
+			if (textColor != null)
 				bar.SetTitleTextColor(textColor.ToAndroid().ToArgb());
 
 			Color navIconColor = NavigationPage.GetIconColor(Current);
-			if (!navIconColor.IsDefault && bar.NavigationIcon != null)
+			if (navIconColor != null && bar.NavigationIcon != null)
 				DrawableExtensions.SetColorFilter(bar.NavigationIcon, navIconColor, FilterMode.SrcAtop);
 
 			bar.Title = currentPage?.Title ?? string.Empty;
 
-			if (_toolbar.NavigationIcon != null && !textColor.IsDefault)
+			if (_toolbar.NavigationIcon != null && textColor != null)
 			{
 				var icon = _toolbar.NavigationIcon as DrawerArrowDrawable;
 				if (icon != null)
@@ -1061,7 +1041,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat
 				_ = this.ApplyDrawableAsync(currentPage, NavigationPage.TitleIconImageSourceProperty, Context, drawable =>
 				{
 					_titleIconView.SetImageDrawable(drawable);
-					FastRenderers.AutomationPropertiesProvider.AccessibilitySettingsChanged(_titleIconView, source);
+					AutomationPropertiesProvider.AccessibilitySettingsChanged(_titleIconView, source);
 				});
 			}
 		}
@@ -1213,7 +1193,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat
 				var width = (int)ctx.FromPixels(MeasureSpecFactory.GetSize(widthMeasureSpec));
 
 				SizeRequest request = _child.Element.Measure(width, double.PositiveInfinity, MeasureFlags.IncludeMargins);
-				Microsoft.Maui.Controls.Layout.LayoutChildIntoBoundingRegion(_child.Element, new Rectangle(0, 0, width, request.Request.Height));
+				Microsoft.Maui.Controls.Compatibility.Layout.LayoutChildIntoBoundingRegion(_child.Element, new Rectangle(0, 0, width, request.Request.Height));
 
 				int widthSpec = MeasureSpecFactory.MakeMeasureSpec((int)ctx.ToPixels(width), MeasureSpecMode.Exactly);
 				int heightSpec = MeasureSpecFactory.MakeMeasureSpec((int)ctx.ToPixels(request.Request.Height), MeasureSpecMode.Exactly);

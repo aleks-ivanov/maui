@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
 using NUnit.Framework;
 
 namespace Microsoft.Maui.Controls.Core.UnitTests
@@ -278,11 +279,6 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 
 			public OSAppTheme RequestedTheme { get; }
 			public string RuntimePlatform { get; }
-
-			public Ticker CreateTicker()
-			{
-				throw new NotImplementedException();
-			}
 
 			public Assembly[] GetAssemblies()
 			{

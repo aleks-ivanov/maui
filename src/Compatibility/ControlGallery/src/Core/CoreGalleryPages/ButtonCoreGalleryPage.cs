@@ -1,4 +1,5 @@
 using Microsoft.Maui.Controls.CustomAttributes;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 {
@@ -29,8 +30,8 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 				new Button
 				{
 					Text = "BorderColor",
-					BackgroundColor = Color.Transparent,
-					BorderColor = Color.Red,
+					BackgroundColor = Colors.Transparent,
+					BorderColor = Colors.Red,
 					BorderWidth = 1,
 				}
 			);
@@ -39,8 +40,8 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 				new Button
 				{
 					Text = "BorderRadius",
-					BackgroundColor = Color.Transparent,
-					BorderColor = Color.Red,
+					BackgroundColor = Colors.Transparent,
+					BorderColor = Colors.Red,
 					CornerRadius = 20,
 					BorderWidth = 1,
 				}
@@ -50,8 +51,8 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 				new Button
 				{
 					Text = "BorderWidth",
-					BackgroundColor = Color.Transparent,
-					BorderColor = Color.Red,
+					BackgroundColor = Colors.Transparent,
+					BorderColor = Colors.Red,
 					BorderWidth = 15,
 				}
 			);
@@ -80,14 +81,6 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 				}
 			);
 
-			var fontContainer = new ViewContainer<Button>(Test.Button.Font,
-				new Button
-				{
-					Text = "Font",
-					Font = Font.SystemFontOfSize(NamedSize.Large, FontAttributes.Bold)
-				}
-			);
-
 			var imageContainer = new ViewContainer<Button>(Test.Button.Image,
 				new Button
 				{
@@ -107,7 +100,7 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 				new Button
 				{
 					Text = "TextColor",
-					TextColor = Color.Pink
+					TextColor = Colors.Pink
 				}
 			);
 
@@ -115,7 +108,7 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 				new Button
 				{
 					Text = "Padding",
-					BackgroundColor = Color.Red,
+					BackgroundColor = Colors.Red,
 					Padding = new Thickness(20, 30, 60, 15)
 				}
 			);
@@ -126,7 +119,6 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 			Add(clickedContainer);
 			Add(pressedContainer);
 			Add(commandContainer);
-			Add(fontContainer);
 			Add(imageContainer);
 			Add(textContainer);
 			Add(textColorContainer);

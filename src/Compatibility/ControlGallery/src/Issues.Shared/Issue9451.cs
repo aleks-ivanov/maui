@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls.CustomAttributes;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.Issues
 {
@@ -18,17 +19,17 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.Issues
 		protected override void Init()
 		{
 			var relativeLayout = new RelativeLayout() { WidthRequest = 400, HeightRequest = 400 };
-			StackLayout = new StackLayout() { BackgroundColor = Color.Red };
+			StackLayout = new StackLayout() { BackgroundColor = Colors.Red };
 
 			TriggerButton = new Button() { Text = "Set View Width To Zero" };
 
 			StackLayout.Children.Add(TriggerButton);
 
 			relativeLayout.Children.Add(StackLayout,
-				Microsoft.Maui.Controls.Constraint.Constant(0),
-				Microsoft.Maui.Controls.Constraint.Constant(0),
-				Microsoft.Maui.Controls.Constraint.RelativeToParent(x => x.Width / 2),
-				Microsoft.Maui.Controls.Constraint.RelativeToParent(y => y.Height));
+				Compatibility.Constraint.Constant(0),
+				Compatibility.Constraint.Constant(0),
+				Compatibility.Constraint.RelativeToParent(x => x.Width / 2),
+				Compatibility.Constraint.RelativeToParent(y => y.Height));
 
 			Content = relativeLayout;
 		}
@@ -49,7 +50,7 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.Issues
 
 		private void Button_Clicked(object sender, EventArgs e)
 		{
-			RelativeLayout.SetWidthConstraint(StackLayout, Microsoft.Maui.Controls.Constraint.Constant(0.0));
+			RelativeLayout.SetWidthConstraint(StackLayout, Compatibility.Constraint.Constant(0.0));
 		}
 	}
 }

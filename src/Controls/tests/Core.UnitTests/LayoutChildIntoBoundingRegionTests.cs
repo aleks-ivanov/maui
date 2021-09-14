@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Maui.Graphics;
 using NUnit.Framework;
 
 namespace Microsoft.Maui.Controls.Core.UnitTests
@@ -37,7 +38,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -67,7 +68,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -99,7 +100,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -130,7 +131,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -161,7 +162,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -191,7 +192,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -221,7 +222,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -251,7 +252,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -281,7 +282,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -311,7 +312,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -341,7 +342,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -371,7 +372,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -401,7 +402,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -431,7 +432,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -462,7 +463,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -493,7 +494,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -523,7 +524,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -553,7 +554,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -583,7 +584,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -613,7 +614,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -643,7 +644,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -673,7 +674,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -703,7 +704,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -733,7 +734,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -763,7 +764,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;
@@ -793,7 +794,7 @@ namespace Microsoft.Maui.Controls.Core.UnitTests
 			layout.Children.Add(view);
 			var region = new Rectangle(Region_X, Region_Y, Region_Width, Region_Height);
 
-			Layout.LayoutChildIntoBoundingRegion(view, region);
+			Compatibility.Layout.LayoutChildIntoBoundingRegion(view, region);
 
 			var target = view.Bounds;
 			var thickness = margin * 2;

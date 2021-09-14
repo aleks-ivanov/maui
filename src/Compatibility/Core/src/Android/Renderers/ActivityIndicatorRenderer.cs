@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using Android.Content;
 using Android.Views;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Graphics;
 using AProgressBar = Android.Widget.ProgressBar;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
@@ -12,6 +14,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			AutoPackage = false;
 		}
 
+		[PortHandler]
 		protected override AProgressBar CreateNativeControl()
 		{
 			return new AProgressBar(Context) { Indeterminate = true };
@@ -42,6 +45,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 				UpdateColor();
 		}
 
+		[PortHandler]
 		void UpdateColor()
 		{
 			if (Element == null || Control == null)
@@ -49,12 +53,13 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 
 			Color color = Element.Color;
 
-			if (!color.IsDefault)
+			if (color != null)
 				Control.IndeterminateDrawable?.SetColorFilter(color.ToAndroid(), FilterMode.SrcIn);
 			else
 				Control.IndeterminateDrawable?.ClearColorFilter();
 		}
 
+		[PortHandler]
 		void UpdateVisibility()
 		{
 			if (Element == null || Control == null)

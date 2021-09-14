@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls
 {
@@ -13,22 +14,6 @@ namespace Microsoft.Maui.Controls
 		bool ShouldShowSplitMode { get; }
 
 		void UpdateFlyoutLayoutBehavior();
-
-		event EventHandler<BackButtonPressedEventArgs> BackButtonPressed;
-	}
-
-	[Obsolete("IMasterDetailPageController is obsolete as of version 5.0.0. Please use IFlyoutPageController instead.")]
-	public interface IMasterDetailPageController
-	{
-		bool CanChangeIsPresented { get; set; }
-
-		Rectangle DetailBounds { get; set; }
-
-		Rectangle MasterBounds { get; set; }
-
-		bool ShouldShowSplitMode { get; }
-
-		void UpdateMasterBehavior();
 
 		event EventHandler<BackButtonPressedEventArgs> BackButtonPressed;
 	}

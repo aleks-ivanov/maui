@@ -1,6 +1,8 @@
 using System;
 using System.ComponentModel;
 using CoreGraphics;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Graphics;
 using UIKit;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
@@ -88,7 +90,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 				return;
 
 			_disposed = true;
-			
+
 			if (disposing && Control != null)
 			{
 				Control.CheckedChanged -= OnControlCheckedChanged;
@@ -121,6 +123,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 			base.OnElementChanged(e);
 		}
 
+		[PortHandler]
 		protected virtual void UpdateTintColor()
 		{
 			if (Element == null)
@@ -129,6 +132,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 			Control.CheckBoxTintColor = Element.Color;
 		}
 
+		[PortHandler]
 		void OnControlCheckedChanged(object sender, EventArgs e)
 		{
 			Element.IsChecked = Control.IsChecked;

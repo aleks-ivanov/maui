@@ -3,8 +3,7 @@ using System.ComponentModel;
 
 namespace Microsoft.Maui.Controls
 {
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public static class EffectiveFlowDirectionExtensions
+	internal static class EffectiveFlowDirectionExtensions
 	{
 		internal static EffectiveFlowDirection ToEffectiveFlowDirection(this FlowDirection self, bool isExplicit = false)
 		{

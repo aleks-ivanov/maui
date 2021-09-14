@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 {
 	public class AppearingGalleryPage : ContentPage
 	{
 		const string NavPageTitle = "NavAppearingPage";
-		const string MasterPageTitle = "MasterAppearingPage";
+		const string FlyoutPageTitle = "FlyoutPageAppearingPage";
 		const string TabbedPageTitle = "TabbedAppearingPage";
 		const string CarouselPageTitle = "CarouselAppearingPage";
 
@@ -26,10 +27,10 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 						Application.Current.MainPage = new NavAppearingPage(initalPage);
 						})
 					},
-					new Button { Text = MasterPageTitle, Command = new Command (() => {
+					new Button { Text = FlyoutPageTitle, Command = new Command (() => {
 						var page = new FlyoutPage {
-							Title = MasterPageTitle,
-							Flyout = new ContentPage { Title = "Flyout", BackgroundColor = Color.Red },
+							Title = FlyoutPageTitle,
+							Flyout = new ContentPage { Title = "Flyout", BackgroundColor = Colors.Red },
 							Detail =  new NavAppearingPage(initalPage)
 						};
 						SetMainPage (page);

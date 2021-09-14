@@ -1,7 +1,8 @@
+﻿using System.Threading.Tasks;
 using Android.Content.Res;
 using Android.Graphics;
+using Android.Graphics.Drawables;
 using Android.Widget;
-using Microsoft.Maui;
 
 namespace Microsoft.Maui
 {
@@ -27,7 +28,7 @@ namespace Microsoft.Maui
 
 		public static void UpdateMinimumTrackColor(this SeekBar seekBar, ISlider slider, ColorStateList? defaultProgressTintList, PorterDuff.Mode? defaultProgressTintMode)
 		{
-			if (slider.MinimumTrackColor == Maui.Color.Default)
+			if (slider.MinimumTrackColor == null)
 			{
 				if (defaultProgressTintList != null)
 					seekBar.ProgressTintList = defaultProgressTintList;
@@ -47,7 +48,7 @@ namespace Microsoft.Maui
 
 		public static void UpdateMaximumTrackColor(this SeekBar seekBar, ISlider slider, ColorStateList? defaultProgressBackgroundTintList, PorterDuff.Mode? defaultProgressBackgroundTintMode)
 		{
-			if (slider.MaximumTrackColor == Maui.Color.Default)
+			if (slider.MaximumTrackColor == null)
 			{
 				if (defaultProgressBackgroundTintList != null)
 					seekBar.ProgressBackgroundTintList = defaultProgressBackgroundTintList;
@@ -67,5 +68,25 @@ namespace Microsoft.Maui
 
 		public static void UpdateThumbColor(this SeekBar seekBar, ISlider slider, ColorFilter? defaultThumbColorFilter) =>
 			seekBar.Thumb?.SetColorFilter(slider.ThumbColor, FilterMode.SrcIn, defaultThumbColorFilter);
+
+		public static async Task UpdateThumbImageSourceAsync(this SeekBar seekBar, ISlider slider, IImageSourceServiceProvider provider, Drawable? defaultThumb)
+		{
+			var context = seekBar.Context;
+
+			if (context == null)
+				return;
+
+			var thumbImageSource = slider.ThumbImageSource;
+
+			if (thumbImageSource != null)
+			{
+				var service = provider.GetRequiredImageSourceService(thumbImageSource);
+				var result = await service.GetDrawableAsync(thumbImageSource, context);
+				Drawable? thumbDrawable = result?.Value;
+
+				if (seekBar.IsAlive())
+					seekBar.SetThumb(thumbDrawable ?? defaultThumb);
+			}
+		}
 	}
 }

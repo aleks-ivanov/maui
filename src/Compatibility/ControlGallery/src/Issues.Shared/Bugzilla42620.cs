@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Maui.Controls.CustomAttributes;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
+using AbsoluteLayoutFlags = Microsoft.Maui.Layouts.AbsoluteLayoutFlags;
 
 #if UITEST
 using Xamarin.UITest;
@@ -64,7 +66,7 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.Issues
 			var label = new Label()
 			{
 				AutomationId = $"{s_id++}",
-				TextColor = Color.Black,
+				TextColor = Graphics.Colors.Black,
 				BackgroundColor = color,
 				VerticalOptions = LayoutOptions.Center
 			};

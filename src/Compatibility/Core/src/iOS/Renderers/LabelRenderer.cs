@@ -1,10 +1,13 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using RectangleF = CoreGraphics.CGRect;
 using SizeF = CoreGraphics.CGSize;
 using Foundation;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Platform.iOS;
+using Microsoft.Maui.Controls.Platform;
 
 #if __MOBILE__
 using UIKit;
@@ -318,12 +321,12 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.MacOS
 		protected override void SetBackgroundColor(Color color)
 		{
 #if __MOBILE__
-			if (color == Color.Default)
+			if (color == null)
 				BackgroundColor = UIColor.Clear;
 			else
 				BackgroundColor = color.ToUIColor();
 #else
-			if (color == Color.Default)
+			if (color == null)
 				Layer.BackgroundColor = NSColor.Clear.CGColor;
 			else
 				Layer.BackgroundColor = color.ToCGColor();
@@ -417,7 +420,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.MacOS
 			if (string.IsNullOrEmpty(Element.Text))
 				return;
 #if __MOBILE__
-			var textAttr = Control.AttributedText.AddCharacterSpacing(Element.Text, Element.CharacterSpacing);
+			var textAttr = Control.AttributedText.WithCharacterSpacing(Element.CharacterSpacing);
 
 			if (textAttr != null)
 				Control.AttributedText = textAttr;
@@ -431,6 +434,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.MacOS
 			_perfectSizeValid = false;
 		}
 
+		[PortHandler("Partially. Mapped LineHeight")]
 		void UpdateText()
 		{
 			if (IsElementOrControlEmpty)
@@ -448,6 +452,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.MacOS
 			}
 		}
 
+		[PortHandler("Partially ported")]
 		void UpdateTextPlainText()
 		{
 			_formatted = Element.FormattedText;
@@ -470,6 +475,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.MacOS
 			UpdateLayout();
 		}
 
+		[PortHandler("Partially ported")]
 		void UpdateFormattedText()
 		{
 #if __MOBILE__
@@ -577,7 +583,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.MacOS
 
 			var textColor = (Color)Element.GetValue(Label.TextColorProperty);
 
-			if (textColor.IsDefault && Element.TextType == TextType.Html)
+			if (textColor == null && Element.TextType == TextType.Html)
 			{
 				// If no explicit text color has been specified and we're displaying HTML, 
 				// let the HTML determine the colors
@@ -586,7 +592,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.MacOS
 
 			// default value of color documented to be black in iOS docs
 #if __MOBILE__
-				Control.TextColor = textColor.ToUIColor(ColorExtensions.LabelColor);
+			Control.TextColor = textColor.ToUIColor(ColorExtensions.LabelColor);
 #else
 			var alignment = Element.HorizontalTextAlignment.ToNativeTextAlignment(((IVisualElementController)Element).EffectiveFlowDirection);
 			var textWithColor = new NSAttributedString(Element.Text ?? "", font: Element.ToNSFont(), foregroundColor: textColor.ToNSColor(ColorExtensions.TextColor), paragraphStyle: new NSMutableParagraphStyle() { Alignment = alignment });

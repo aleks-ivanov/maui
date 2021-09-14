@@ -9,6 +9,9 @@ using Android.Views;
 using Android.Widget;
 using Google.Android.Material.BottomNavigation;
 using Google.Android.Material.BottomSheet;
+using Google.Android.Material.Navigation;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Graphics;
 using AColor = Android.Graphics.Color;
 using AView = Android.Views.View;
 using IMenu = Android.Views.IMenu;
@@ -17,16 +20,16 @@ using Orientation = Android.Widget.Orientation;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 {
-	public class ShellItemRenderer : ShellItemRendererBase, BottomNavigationView.IOnNavigationItemSelectedListener, IAppearanceObserver
+	public class ShellItemRenderer : ShellItemRendererBase, NavigationBarView.IOnItemSelectedListener, IAppearanceObserver
 	{
-		#region IOnNavigationItemSelectedListener
+		#region IOnItemSelectedListener
 
-		bool BottomNavigationView.IOnNavigationItemSelectedListener.OnNavigationItemSelected(IMenuItem item)
+		bool NavigationBarView.IOnItemSelectedListener.OnNavigationItemSelected(IMenuItem item)
 		{
 			return OnItemSelected(item);
 		}
 
-		#endregion IOnNavigationItemSelectedListener
+		#endregion IOnItemSelectedListener
 
 		#region IAppearanceObserver
 
@@ -62,8 +65,8 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			_bottomView = _outerLayout.FindViewById<BottomNavigationView>(Resource.Id.bottomtab_tabbar);
 			_navigationArea = _outerLayout.FindViewById<FrameLayout>(Resource.Id.bottomtab_navarea);
 
-			_bottomView.SetBackgroundColor(Color.White.ToAndroid());
-			_bottomView.SetOnNavigationItemSelectedListener(this);
+			_bottomView.SetBackgroundColor(Colors.White.ToAndroid());
+			_bottomView.SetOnItemSelectedListener(this);
 
 			if (ShellItem == null)
 				throw new InvalidOperationException("Active Shell Item not set. Have you added any Shell Items to your Shell?");
@@ -102,7 +105,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 
 			if (_bottomView != null)
 			{
-				_bottomView?.SetOnNavigationItemSelectedListener(null);
+				_bottomView?.SetOnItemSelectedListener(null);
 				_bottomView?.Background?.Dispose();
 				_bottomView?.Dispose();
 			}
@@ -205,7 +208,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 					{
 						if (!image.IsDisposed())
 						{
-							var color = Color.Black.MultiplyAlpha(0.6).ToAndroid();
+							var color = Colors.Black.MultiplyAlpha(0.6f).ToAndroid();
 							icon.SetTint(color);
 							image.SetImageDrawable(icon);
 						}
@@ -275,7 +278,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			if (id == MoreTabId)
 			{
 				var items = CreateTabList(ShellItem);
-				_bottomSheetDialog = BottomNavigationViewUtils.CreateMoreBottomSheet(OnMoreItemSelected, Context, items, _bottomView.MaxItemCount);
+				_bottomSheetDialog = BottomNavigationViewUtils.CreateMoreBottomSheet(OnMoreItemSelected, ShellItem.FindMauiContext(), items, _bottomView.MaxItemCount);
 				_bottomSheetDialog.Show();
 				_bottomSheetDialog.DismissEvent += OnMoreSheetDismissed;
 			}
@@ -383,7 +386,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 				items,
 				currentIndex,
 				_bottomView,
-				Context);
+				ShellItem.FindMauiContext());
 
 			UpdateTabBarVisibility();
 		}

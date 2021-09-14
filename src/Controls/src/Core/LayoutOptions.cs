@@ -2,7 +2,7 @@ using System;
 
 namespace Microsoft.Maui.Controls
 {
-	[TypeConverter(typeof(LayoutOptionsConverter))]
+	[System.ComponentModel.TypeConverter(typeof(LayoutOptionsConverter))]
 	public struct LayoutOptions
 	{
 		int _flags;
@@ -34,6 +34,23 @@ namespace Microsoft.Maui.Controls
 		{
 			get { return (_flags & (int)LayoutExpandFlag.Expand) != 0; }
 			set { _flags = (_flags & 3) | (value ? (int)LayoutExpandFlag.Expand : 0); }
+		}
+
+		internal Primitives.LayoutAlignment ToCore()
+		{
+			switch (Alignment)
+			{
+				case LayoutAlignment.Start:
+					return Primitives.LayoutAlignment.Start;
+				case LayoutAlignment.Center:
+					return Primitives.LayoutAlignment.Center;
+				case LayoutAlignment.End:
+					return Primitives.LayoutAlignment.End;
+				case LayoutAlignment.Fill:
+					return Primitives.LayoutAlignment.Fill;
+			}
+
+			return Primitives.LayoutAlignment.Start;
 		}
 	}
 }

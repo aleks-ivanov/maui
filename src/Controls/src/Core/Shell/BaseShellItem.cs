@@ -6,11 +6,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Controls.StyleSheets;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls
 {
 	[DebuggerDisplay("Title = {Title}, Route = {Route}")]
-	public class BaseShellItem : NavigableElement, IPropertyPropagationController, IVisualController, IFlowDirectionController, ITabStopElement
+	public class BaseShellItem : NavigableElement, IPropertyPropagationController, IVisualController, IFlowDirectionController
 	{
 		public event EventHandler Appearing;
 		public event EventHandler Disappearing;
@@ -41,36 +42,8 @@ namespace Microsoft.Maui.Controls
 		public static readonly BindableProperty TitleProperty =
 			BindableProperty.Create(nameof(Title), typeof(string), typeof(BaseShellItem), null, BindingMode.OneTime);
 
-		public static readonly BindableProperty TabIndexProperty =
-			BindableProperty.Create(nameof(TabIndex),
-							typeof(int),
-							typeof(BaseShellItem),
-							defaultValue: 0,
-							propertyChanged: OnTabIndexPropertyChanged,
-							defaultValueCreator: TabIndexDefaultValueCreator);
-
-		public static readonly BindableProperty IsTabStopProperty =
-			BindableProperty.Create(nameof(IsTabStop),
-									typeof(bool),
-									typeof(BaseShellItem),
-									defaultValue: true,
-									propertyChanged: OnTabStopPropertyChanged,
-									defaultValueCreator: TabStopDefaultValueCreator);
-
 		public static readonly BindableProperty IsVisibleProperty =
 			BindableProperty.Create(nameof(IsVisible), typeof(bool), typeof(BaseShellItem), true);
-
-		static void OnTabIndexPropertyChanged(BindableObject bindable, object oldValue, object newValue) =>
-			((BaseShellItem)bindable).OnTabIndexPropertyChanged((int)oldValue, (int)newValue);
-
-		static object TabIndexDefaultValueCreator(BindableObject bindable) =>
-			((BaseShellItem)bindable).TabIndexDefaultValueCreator();
-
-		static void OnTabStopPropertyChanged(BindableObject bindable, object oldValue, object newValue) =>
-			((BaseShellItem)bindable).OnTabStopPropertyChanged((bool)oldValue, (bool)newValue);
-
-		static object TabStopDefaultValueCreator(BindableObject bindable) =>
-			((BaseShellItem)bindable).TabStopDefaultValueCreator();
 
 		public ImageSource FlyoutIcon
 		{
@@ -102,22 +75,6 @@ namespace Microsoft.Maui.Controls
 		{
 			get { return (string)GetValue(TitleProperty); }
 			set { SetValue(TitleProperty, value); }
-		}
-
-		public int TabIndex
-		{
-			get => (int)GetValue(TabIndexProperty);
-			set => SetValue(TabIndexProperty, value);
-		}
-
-		protected virtual void OnTabIndexPropertyChanged(int oldValue, int newValue) { }
-
-		protected virtual int TabIndexDefaultValueCreator() => 0;
-
-		public bool IsTabStop
-		{
-			get => (bool)GetValue(IsTabStopProperty);
-			set => SetValue(IsTabStopProperty, value);
 		}
 
 		public bool IsVisible
@@ -202,10 +159,6 @@ namespace Microsoft.Maui.Controls
 			}
 		}
 
-		protected virtual void OnTabStopPropertyChanged(bool oldValue, bool newValue) { }
-
-		protected virtual bool TabStopDefaultValueCreator() => true;
-
 		IVisual _effectiveVisual = Microsoft.Maui.Controls.VisualMarker.Default;
 		IVisual IVisualController.EffectiveVisual
 		{
@@ -265,7 +218,7 @@ namespace Microsoft.Maui.Controls
 
 		void IPropertyPropagationController.PropagatePropertyChanged(string propertyName)
 		{
-			PropertyPropagationExtensions.PropagatePropertyChanged(propertyName, this, LogicalChildren);
+			PropertyPropagationExtensions.PropagatePropertyChanged(propertyName, this, ((IElementController)this).LogicalChildren);
 		}
 
 		EffectiveFlowDirection _effectiveFlowDirection = default(EffectiveFlowDirection);
@@ -288,7 +241,7 @@ namespace Microsoft.Maui.Controls
 		bool IFlowDirectionController.ApplyEffectiveFlowDirectionToChildContainer => true;
 		double IFlowDirectionController.Width => (Parent as VisualElement)?.Width ?? 0;
 
-		internal virtual void ApplyQueryAttributes(IDictionary<string, string> query)
+		internal virtual void ApplyQueryAttributes(ShellRouteParameters query)
 		{
 		}
 
@@ -380,7 +333,7 @@ namespace Microsoft.Maui.Controls
 					selectedState.Setters.Add(new Setter
 					{
 						Property = VisualElement.BackgroundColorProperty,
-						Value = new Color(0.95)
+						Value = new Color(0.95f)
 
 					});
 				}
@@ -390,7 +343,7 @@ namespace Microsoft.Maui.Controls
 					normalState.Setters.Add(new Setter
 					{
 						Property = VisualElement.BackgroundColorProperty,
-						Value = Color.Transparent
+						Value = Colors.Transparent
 					});
 				}
 
@@ -441,18 +394,29 @@ namespace Microsoft.Maui.Controls
 				Binding imageBinding = new Binding(iconBinding);
 				defaultImageClass.Setters.Add(new Setter { Property = Image.SourceProperty, Value = imageBinding });
 
-				grid.Children.Add(image);
+				grid.Add(image);
 
 				var label = new Label();
 				Binding labelBinding = new Binding(textBinding);
 				defaultLabelClass.Setters.Add(new Setter { Property = Label.TextProperty, Value = labelBinding });
 
-				grid.Children.Add(label, 1, 0);
+				grid.Add(label, 1, 0);
 
 				if (Device.RuntimePlatform == Device.Android)
 				{
+					object textColor;
+
+					if (Application.Current == null)
+					{
+						textColor = Colors.Black.MultiplyAlpha(0.87f);
+					}
+					else
+					{
+						textColor = new AppThemeBinding { Light = Colors.Black.MultiplyAlpha(0.87f), Dark = Colors.White };
+					}
+
 					defaultLabelClass.Setters.Add(new Setter { Property = Label.FontSizeProperty, Value = 14 });
-					defaultLabelClass.Setters.Add(new Setter { Property = Label.TextColorProperty, Value = Color.Black.MultiplyAlpha(0.87) });
+					defaultLabelClass.Setters.Add(new Setter { Property = Label.TextColorProperty, Value = textColor });
 					defaultLabelClass.Setters.Add(new Setter { Property = Label.FontFamilyProperty, Value = "sans-serif-medium" });
 					defaultLabelClass.Setters.Add(new Setter { Property = Label.MarginProperty, Value = new Thickness(20, 0, 0, 0) });
 				}
@@ -491,6 +455,6 @@ namespace Microsoft.Maui.Controls
 
 	public interface IQueryAttributable
 	{
-		void ApplyQueryAttributes(IDictionary<string, string> query);
+		void ApplyQueryAttributes(IDictionary<string, object> query);
 	}
 }

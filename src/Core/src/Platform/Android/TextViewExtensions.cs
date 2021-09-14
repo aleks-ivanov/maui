@@ -1,44 +1,71 @@
+using Android.Content.Res;
 using Android.Graphics;
 using Android.Text;
 using Android.Util;
 using Android.Widget;
+using static Android.Widget.TextView;
+using ALayoutDirection = Android.Views.LayoutDirection;
+using ATextDirection = Android.Views.TextDirection;
 
 namespace Microsoft.Maui
 {
 	public static class TextViewExtensions
 	{
-		public static void UpdateText(this TextView textView, ILabel label)
+		public static void UpdateTextPlainText(this TextView textView, ILabel label)
 		{
 			textView.Text = label.Text;
 		}
 
-		public static void UpdateTextColor(this TextView textView, ILabel label, Color defaultColor)
+		public static void UpdateTextHtml(this TextView textView, ILabel label)
 		{
-			Color textColor = label.TextColor;
+			var newText = label.Text ?? string.Empty;
 
-			if (textColor.IsDefault)
-			{
-				textView.SetTextColor(defaultColor.ToNative());
-			}
+			if (NativeVersion.IsAtLeast(24))
+				textView.SetText(Html.FromHtml(newText, FromHtmlOptions.ModeCompact), BufferType.Spannable);
 			else
-			{
-				textView.SetTextColor(textColor.ToNative());
-			}
+#pragma warning disable CS0618 // Type or member is obsolete
+				textView.SetText(Html.FromHtml(newText), BufferType.Spannable);
+#pragma warning restore CS0618 // Type or member is obsolete
 		}
 
-		public static void UpdateCharacterSpacing(this TextView textView, ILabel label) =>
-			textView.LetterSpacing = label.CharacterSpacing.ToEm();
-
-		public static void UpdateFont(this TextView textView, ILabel label, IFontManager fontManager)
+		public static void UpdateTextColor(this TextView textView, ITextStyle textStyle, Graphics.Color defaultColor)
 		{
-			var font = label.Font;
+			var textColor = textStyle.TextColor?.ToNative() ?? defaultColor?.ToNative();
+
+			if (textColor != null)
+				textView.SetTextColor(textColor.Value);
+		}
+
+		public static void UpdateTextColor(this TextView textView, ITextStyle textStyle) =>
+			textView.UpdateTextColor(textStyle, textView.TextColors);
+
+		public static void UpdateTextColor(this TextView textView, ITextStyle textStyle, ColorStateList? defaultColor)
+		{
+			var textColor = textStyle.TextColor;
+
+			if (textColor != null)
+			{
+				textView.SetTextColor(textColor.ToNative());
+				return;
+			}
+
+			if (defaultColor != null)
+				textView.SetTextColor(defaultColor);
+		}
+
+		public static void UpdateFont(this TextView textView, ITextStyle textStyle, IFontManager fontManager)
+		{
+			var font = textStyle.Font;
 
 			var tf = fontManager.GetTypeface(font);
 			textView.Typeface = tf;
 
-			var sp = fontManager.GetScaledPixel(font);
-			textView.SetTextSize(ComplexUnitType.Sp, sp);
+			var fontSize = fontManager.GetFontSize(font);
+			textView.SetTextSize(fontSize.Unit, fontSize.Value);
 		}
+
+		public static void UpdateCharacterSpacing(this TextView textView, ITextStyle textStyle) =>
+			textView.LetterSpacing = textStyle.CharacterSpacing.ToEm();
 
 		public static void UpdateHorizontalTextAlignment(this TextView textView, ITextAlignment text)
 		{
@@ -52,7 +79,7 @@ namespace Microsoft.Maui
 			{
 				// But if RTL support is not available for some reason, we have to resort
 				// to gravity, because Android will simply ignore text alignment
-				textView.Gravity = text.HorizontalTextAlignment.ToHorizontalGravityFlags();
+				textView.Gravity = Android.Views.GravityFlags.Top | text.HorizontalTextAlignment.ToHorizontalGravityFlags();
 			}
 		}
 
@@ -63,9 +90,7 @@ namespace Microsoft.Maui
 
 		public static void UpdateMaxLines(this TextView textView, ILabel label)
 		{
-			int maxLinex = label.MaxLines;
-
-			textView.SetMaxLines(maxLinex);
+			textView.SetLineBreakMode(label);
 		}
 
 		public static void UpdatePadding(this TextView textView, ILabel label)
@@ -97,6 +122,32 @@ namespace Microsoft.Maui
 				textView.PaintFlags &= ~PaintFlags.UnderlineText;
 			else
 				textView.PaintFlags |= PaintFlags.UnderlineText;
+		}
+
+		public static void UpdateFlowDirection(this TextView nativeView, IView view)
+		{
+			if (view.FlowDirection == view.Handler?.MauiContext?.GetFlowDirection() ||
+				view.FlowDirection == FlowDirection.MatchParent)
+			{
+				nativeView.LayoutDirection = ALayoutDirection.Inherit;
+				nativeView.TextDirection = ATextDirection.Inherit;
+			}
+			else if (view.FlowDirection == FlowDirection.RightToLeft)
+			{
+				nativeView.LayoutDirection = ALayoutDirection.Rtl;
+				nativeView.TextDirection = ATextDirection.Rtl;
+			}
+			else if (view.FlowDirection == FlowDirection.LeftToRight)
+			{
+				nativeView.LayoutDirection = ALayoutDirection.Ltr;
+				nativeView.TextDirection = ATextDirection.Ltr;
+			}
+		}
+
+		public static void UpdateLineHeight(this TextView textView, ILabel label)
+		{
+			if (label.LineHeight >= 0)
+				textView.SetLineSpacing(0, (float)label.LineHeight);
 		}
 
 		internal static void SetLineBreakMode(this TextView textView, ILabel label)

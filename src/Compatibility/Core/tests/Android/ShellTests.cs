@@ -7,7 +7,8 @@ using NUnit.Framework;
 using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls.CustomAttributes;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android.UnitTests;
-
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Controls.Platform;
 
 [assembly: ExportRenderer(typeof(TestShell), typeof(TestShellRenderer))]
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.UnitTests
@@ -31,11 +32,11 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.UnitTests
 					testSurface = await TestActivity.GetTestSurface(Context, shell);
 					var addedView = shell.GetRenderer().View;
 					Assert.IsNotNull(addedView);
-					Assert.IsNull(newHeader.GetValue(AppCompat.Platform.RendererProperty));
-					Assert.IsNotNull(initialHeader.GetValue(AppCompat.Platform.RendererProperty));
+					Assert.IsNull(newHeader.GetValue(Platform.RendererProperty));
+					Assert.IsNotNull(initialHeader.GetValue(Platform.RendererProperty));
 					await Device.InvokeOnMainThreadAsync(() => shell.FlyoutHeader = newHeader);
-					Assert.IsNotNull(newHeader.GetValue(AppCompat.Platform.RendererProperty), "New Header Not Set Up");
-					Assert.IsNull(initialHeader.GetValue(AppCompat.Platform.RendererProperty), "Old Header Still Set Up");
+					Assert.IsNotNull(newHeader.GetValue(Platform.RendererProperty), "New Header Not Set Up");
+					Assert.IsNull(initialHeader.GetValue(Platform.RendererProperty), "Old Header Still Set Up");
 				}
 				finally
 				{
@@ -59,7 +60,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.UnitTests
 					return (ColorChangeRevealDrawable)bottomView.Background;
 				});
 
-			Assert.AreEqual(Color.White.ToAndroid(), ccr.EndColor);
+			Assert.AreEqual(Colors.White.ToAndroid(), ccr.EndColor);
 		}
 
 		public class ShellAppearanceTest : IShellAppearanceElement

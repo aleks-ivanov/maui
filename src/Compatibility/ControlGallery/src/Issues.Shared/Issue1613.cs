@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls.CustomAttributes;
 using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Controls.Maps;
+using Microsoft.Maui.Graphics;
+using AbsoluteLayoutFlags = Microsoft.Maui.Layouts.AbsoluteLayoutFlags;
 
 namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.Issues
 {
@@ -38,13 +40,13 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.Issues
 				VerticalTextAlignment = TextAlignment.Center,
 				FontSize = 30,
 				FontAttributes = FontAttributes.Bold,
-				TextColor = Color.White,
+				TextColor = Colors.White,
 			};
 
 			var nameView = new AbsoluteLayout
 			{
 				HeightRequest = 170,
-				BackgroundColor = Color.Black,
+				BackgroundColor = Colors.Black,
 				Children = {
 					{image, new Rectangle(0, 0, 1, 1), AbsoluteLayoutFlags.All},
 					{name, new Rectangle(0, 0, 1, 1), AbsoluteLayoutFlags.All}

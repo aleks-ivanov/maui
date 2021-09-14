@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.DeviceTests.Stubs;
+using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Handlers;
 using UIKit;
 using Xunit;
@@ -9,38 +10,121 @@ namespace Microsoft.Maui.DeviceTests
 {
 	public partial class EntryHandlerTests
 	{
-		[Theory(DisplayName = "Font Family Initializes Correctly")]
-		[InlineData(null)]
-		[InlineData("Times New Roman")]
-		[InlineData("Dokdo")]
-		public async Task FontFamilyInitializesCorrectly(string family)
+		[Fact(DisplayName = "Horizontal TextAlignment Initializes Correctly")]
+		public async Task HorizontalTextAlignmentInitializesCorrectly()
 		{
+			var xplatHorizontalTextAlignment = TextAlignment.End;
+
+			var entry = new EntryStub()
+			{
+				Text = "Test",
+				HorizontalTextAlignment = xplatHorizontalTextAlignment
+			};
+
+			UITextAlignment expectedValue = UITextAlignment.Right;
+
+			var values = await GetValueAsync(entry, (handler) =>
+			{
+				return new
+				{
+					ViewValue = entry.HorizontalTextAlignment,
+					NativeViewValue = GetNativeHorizontalTextAlignment(handler)
+				};
+			});
+
+			Assert.Equal(xplatHorizontalTextAlignment, values.ViewValue);
+			values.NativeViewValue.AssertHasFlag(expectedValue);
+		}
+
+		[Fact(DisplayName = "Vertical TextAlignment Initializes Correctly")]
+		public async Task VerticalTextAlignmentInitializesCorrectily()
+		{
+			var xplatVerticalTextAlignment = TextAlignment.End;
+
 			var entry = new EntryStub
 			{
 				Text = "Test",
-				Font = Font.OfSize(family, 10)
+				VerticalTextAlignment = xplatVerticalTextAlignment
 			};
 
-			var nativeFont = await GetValueAsync(entry, handler => GetNativeEntry(handler).Font);
+			UIControlContentVerticalAlignment expectedValue = UIControlContentVerticalAlignment.Bottom;
 
-			var fontManager = App.Services.GetRequiredService<IFontManager>();
+			var values = await GetValueAsync(entry, (handler) =>
+			{
+				return new
+				{
+					ViewValue = entry.VerticalTextAlignment,
+					NativeViewValue = GetNativeVerticalTextAlignment(handler)
+				};
+			});
 
-			var expectedNativeFont = fontManager.GetFont(Font.OfSize(family, 0.0));
-
-			Assert.Equal(expectedNativeFont.FamilyName, nativeFont.FamilyName);
-			if (string.IsNullOrEmpty(family))
-				Assert.Equal(fontManager.DefaultFont.FamilyName, nativeFont.FamilyName);
-			else
-				Assert.NotEqual(fontManager.DefaultFont.FamilyName, nativeFont.FamilyName);
+			Assert.Equal(xplatVerticalTextAlignment, values.ViewValue);
+			values.NativeViewValue.AssertHasFlag(expectedValue);
 		}
 
-		UITextField GetNativeEntry(EntryHandler entryHandler) =>
-			(UITextField)entryHandler.View;
+		[Fact(DisplayName = "ReturnType Initializes Correctly")]
+		public async Task ReturnTypeInitializesCorrectly()
+		{
+			var xplatReturnType = ReturnType.Next;
+			var entry = new EntryStub()
+			{
+				Text = "Test",
+				ReturnType = xplatReturnType
+			};
 
-		string GetNativeText(EntryHandler entryHandler) =>
+			UIReturnKeyType expectedValue = UIReturnKeyType.Next;
+
+			var values = await GetValueAsync(entry, (handler) =>
+			{
+				return new
+				{
+					ViewValue = entry.ReturnType,
+					NativeViewValue = GetNativeReturnType(handler)
+				};
+			});
+
+			Assert.Equal(xplatReturnType, values.ViewValue);
+			Assert.Equal(expectedValue, values.NativeViewValue);
+		}
+
+		[Fact(DisplayName = "CharacterSpacing Initializes Correctly")]
+		public async Task CharacterSpacingInitializesCorrectly()
+		{
+			string originalText = "Some Test Text";
+			var xplatCharacterSpacing = 4;
+
+			var entry = new EntryStub()
+			{
+				CharacterSpacing = xplatCharacterSpacing,
+				Text = originalText
+			};
+
+			var values = await GetValueAsync(entry, (handler) =>
+			{
+				return new
+				{
+					ViewValue = entry.CharacterSpacing,
+					NativeViewValue = GetNativeCharacterSpacing(handler)
+				};
+			});
+
+			Assert.Equal(xplatCharacterSpacing, values.ViewValue);
+			Assert.Equal(xplatCharacterSpacing, values.NativeViewValue);
+		}
+
+		double GetNativeCharacterSpacing(EntryHandler entryHandler)
+		{
+			var entry = GetNativeEntry(entryHandler);
+			return entry.AttributedText.GetCharacterSpacing();
+		}
+
+		static UITextField GetNativeEntry(EntryHandler entryHandler) =>
+			(UITextField)entryHandler.NativeView;
+
+		static string GetNativeText(EntryHandler entryHandler) =>
 			GetNativeEntry(entryHandler).Text;
 
-		void SetNativeText(EntryHandler entryHandler, string text) =>
+		static void SetNativeText(EntryHandler entryHandler, string text) =>
 			GetNativeEntry(entryHandler).Text = text;
 
 		Color GetNativeTextColor(EntryHandler entryHandler) =>
@@ -58,13 +142,66 @@ namespace Microsoft.Maui.DeviceTests
 		bool GetNativeIsReadOnly(EntryHandler entryHandler) =>
 			!GetNativeEntry(entryHandler).UserInteractionEnabled;
 
-		double GetNativeUnscaledFontSize(EntryHandler entryHandler) =>
-			GetNativeEntry(entryHandler).Font.PointSize;
+		bool GetNativeIsNumericKeyboard(EntryHandler entryHandler) =>
+			GetNativeEntry(entryHandler).KeyboardType == UIKeyboardType.DecimalPad;
 
-		bool GetNativeIsBold(EntryHandler entryHandler) =>
-			GetNativeEntry(entryHandler).Font.FontDescriptor.SymbolicTraits.HasFlag(UIFontDescriptorSymbolicTraits.Bold);
+		bool GetNativeIsEmailKeyboard(EntryHandler entryHandler) =>
+			GetNativeEntry(entryHandler).KeyboardType == UIKeyboardType.EmailAddress;
 
-		bool GetNativeIsItalic(EntryHandler entryHandler) =>
-			GetNativeEntry(entryHandler).Font.FontDescriptor.SymbolicTraits.HasFlag(UIFontDescriptorSymbolicTraits.Italic);
+		bool GetNativeIsTelephoneKeyboard(EntryHandler entryHandler) =>
+			GetNativeEntry(entryHandler).KeyboardType == UIKeyboardType.PhonePad;
+
+		bool GetNativeIsUrlKeyboard(EntryHandler entryHandler) =>
+			GetNativeEntry(entryHandler).KeyboardType == UIKeyboardType.Url;
+
+		bool GetNativeIsTextKeyboard(EntryHandler entryHandler)
+		{
+			var nativeEntry = GetNativeEntry(entryHandler);
+
+			return nativeEntry.AutocapitalizationType == UITextAutocapitalizationType.Sentences &&
+				nativeEntry.AutocorrectionType == UITextAutocorrectionType.Yes &&
+				nativeEntry.SpellCheckingType == UITextSpellCheckingType.Yes;
+		}
+
+		bool GetNativeIsChatKeyboard(EntryHandler entryHandler)
+		{
+			var nativeEntry = GetNativeEntry(entryHandler);
+
+			return nativeEntry.AutocapitalizationType == UITextAutocapitalizationType.Sentences &&
+				nativeEntry.AutocorrectionType == UITextAutocorrectionType.Yes &&
+				nativeEntry.SpellCheckingType == UITextSpellCheckingType.No;
+		}
+
+		bool GetNativeClearButtonVisibility(EntryHandler entryHandler) =>
+			GetNativeEntry(entryHandler).ClearButtonMode == UITextFieldViewMode.WhileEditing;
+
+		UITextAlignment GetNativeHorizontalTextAlignment(EntryHandler entryHandler) =>
+			GetNativeEntry(entryHandler).TextAlignment;
+
+		UIControlContentVerticalAlignment GetNativeVerticalTextAlignment(EntryHandler entryHandler) =>
+			GetNativeEntry(entryHandler).VerticalAlignment;
+
+		UIReturnKeyType GetNativeReturnType(EntryHandler entryHandler) =>
+			GetNativeEntry(entryHandler).ReturnKeyType;
+
+		int GetNativeCursorPosition(EntryHandler entryHandler)
+		{
+			var textField = GetNativeEntry(entryHandler);
+
+			if (textField != null && textField.SelectedTextRange != null)
+				return (int)textField.GetOffsetFromPosition(textField.BeginningOfDocument, textField.SelectedTextRange.Start);
+
+			return -1;
+		}
+
+		int GetNativeSelectionLength(EntryHandler entryHandler)
+		{
+			var textField = GetNativeEntry(entryHandler);
+
+			if (textField != null && textField.SelectedTextRange != null)
+				return (int)textField.GetOffsetFromPosition(textField.SelectedTextRange.Start, textField.SelectedTextRange.End);
+
+			return -1;
+		}
 	}
 }

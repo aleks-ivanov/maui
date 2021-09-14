@@ -1,6 +1,7 @@
 using System;
 using Android.Content;
 using Android.Views;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 {
@@ -123,8 +124,8 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 
 		static IVisualElementRenderer CreateRenderer(View view, Context context)
 		{
-			var renderer = AppCompat.Platform.CreateRenderer(view, context);
-			AppCompat.Platform.SetRenderer(view, renderer);
+			var renderer = Platform.CreateRenderer(view, context);
+			Platform.SetRenderer(view, renderer);
 
 			return renderer;
 		}

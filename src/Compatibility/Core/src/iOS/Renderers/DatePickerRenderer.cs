@@ -3,12 +3,15 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using Foundation;
+using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;
+using Microsoft.Maui.Platform.iOS;
 using UIKit;
 using RectangleF = CoreGraphics.CGRect;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 {
+	[PortHandler]
 	internal class NoCaretField : UITextField
 	{
 		public NoCaretField() : base(new RectangleF())
@@ -32,6 +35,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 
 		}
 
+		[PortHandler]
 		protected override UITextField CreateNativeControl()
 		{
 			return new NoCaretField { BorderStyle = UITextBorderStyle.RoundedRect };
@@ -207,23 +211,28 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 			(Control as UITextField).UpdateTextAlignment(Element);
 		}
 
+		[PortHandler]
 		protected internal virtual void UpdateFont()
 		{
 			Control.Font = Element.ToUIFont();
 		}
 
+		[PortHandler]
 		void UpdateCharacterSpacing()
 		{
-			var textAttr = Control.AttributedText.AddCharacterSpacing(Control.Text, Element.CharacterSpacing);
+			var textAttr = Control.AttributedText.WithCharacterSpacing(Element.CharacterSpacing);
 
 			if (textAttr != null)
 				Control.AttributedText = textAttr;
 		}
+
+		[PortHandler]
 		void UpdateMaximumDate()
 		{
 			_picker.MaximumDate = Element.MaximumDate.ToNSDate();
 		}
 
+		[PortHandler]
 		void UpdateMinimumDate()
 		{
 			_picker.MinimumDate = Element.MinimumDate.ToNSDate();
@@ -233,7 +242,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 		{
 			var textColor = Element.TextColor;
 
-			if (textColor.IsDefault || (!Element.IsEnabled && _useLegacyColorManagement))
+			if (textColor == null || (!Element.IsEnabled && _useLegacyColorManagement))
 				Control.TextColor = _defaultTextColor;
 			else
 				Control.TextColor = textColor.ToUIColor();

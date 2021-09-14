@@ -4,6 +4,7 @@ using Android.Content;
 using Android.Views;
 using Android.Widget;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 {
@@ -17,8 +18,6 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 		public PlatformRenderer(Context context, IPlatformLayout canvas) : base(context)
 		{
 			_canvas = canvas;
-			Focusable = true;
-			FocusableInTouchMode = true;
 		}
 
 		public override bool DispatchTouchEvent(MotionEvent e)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -14,6 +14,9 @@ using Foundation;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Animations;
 
 #if __MOBILE__
 using UIKit;
@@ -27,15 +30,16 @@ using TNativeView = AppKit.NSView;
 
 namespace Microsoft.Maui.Controls.Compatibility
 {
+	public struct InitializationOptions
+	{
+		public InitializationFlags Flags;
+	}
+
 	public static class Forms
 	{
-		public static IActivationState ActivationState { get; private set; }
+		internal static IMauiContext MauiContext { get; private set; }
+
 		public static bool IsInitialized { get; private set; }
-
-		static IFontManager s_fontManager;
-
-		internal static IFontManager FontManager =>
-			s_fontManager ??= new FontManager(Microsoft.Maui.Controls.Internals.Registrar.FontRegistrar);
 
 #if __MOBILE__
 		static bool? s_isiOS9OrNewer;
@@ -107,6 +111,12 @@ namespace Microsoft.Maui.Controls.Compatibility
 			}
 		}
 
+		// Once we get essentials/cg converted to using startup.cs
+		// we will delete all the renderer code inside this file
+		internal static void RenderersRegistered()
+		{
+			IsInitializedRenderers = true;
+		}
 
 		internal static bool RespondsToSetNeedsUpdateOfHomeIndicatorAutoHidden
 		{
@@ -174,37 +184,46 @@ namespace Microsoft.Maui.Controls.Compatibility
 		}
 
 		public static void Init() =>
-			Init(new ActivationState(new MauiContext()));
+			SetupInit(new MauiContext());
 
-		public static void Init(IActivationState activationState)
+		public static void Init(InitializationOptions options) =>
+			SetupInit(new MauiContext(), options);
+
+		public static void Init(IActivationState activationState, InitializationOptions? options = null) =>
+			SetupInit(activationState.Context, options);
+
+		static void SetupInit(IMauiContext context, InitializationOptions? maybeOptions = null)
 		{
-			if (IsInitialized)
-				return;
-
-			ActivationState = activationState;
-			IsInitialized = true;
+			MauiContext = context;
 
 			Microsoft.Maui.Controls.Internals.Registrar.RegisterRendererToHandlerShim(RendererToHandlerShim.CreateShim);
 
-			//TODO: MAUI Accent Color?
-			Color.SetAccent(Color.FromRgba(50, 79, 133, 255));
+			Application.AccentColor = Color.FromRgba(50, 79, 133, 255);
 
-			Log.Listeners.Add(new DelegateLogListener((c, m) => Trace.WriteLine(m, c)));
+			if (!IsInitialized)
+			{
+				// Only need to do this once
+				Log.Listeners.Add(new DelegateLogListener((c, m) => Trace.WriteLine(m, c)));
+			}
 
 #if __MOBILE__
 			Device.SetIdiom(UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad ? TargetIdiom.Tablet : TargetIdiom.Phone);
 			Device.SetFlowDirection(UIApplication.SharedApplication.UserInterfaceLayoutDirection.ToFlowDirection());
 #else
-			// Subscribe to notifications in OS Theme changes
-			NSDistributedNotificationCenter.GetDefaultCenter().AddObserver((NSString)"AppleInterfaceThemeChangedNotification", (n) =>
+			if (!IsInitialized)
 			{
-				var interfaceStyle = NSUserDefaults.StandardUserDefaults.StringForKey("AppleInterfaceStyle");
+				// Only need to do this once
+				// Subscribe to notifications in OS Theme changes
+				NSDistributedNotificationCenter.GetDefaultCenter().AddObserver((NSString)"AppleInterfaceThemeChangedNotification", (n) =>
+				{
+					var interfaceStyle = NSUserDefaults.StandardUserDefaults.StringForKey("AppleInterfaceStyle");
 
-				var aquaAppearance = NSAppearance.GetAppearance(interfaceStyle == "Dark" ? NSAppearance.NameDarkAqua : NSAppearance.NameAqua);
-				NSApplication.SharedApplication.Appearance = aquaAppearance;
+					var aquaAppearance = NSAppearance.GetAppearance(interfaceStyle == "Dark" ? NSAppearance.NameDarkAqua : NSAppearance.NameAqua);
+					NSApplication.SharedApplication.Appearance = aquaAppearance;
 
-				Application.Current?.TriggerThemeChanged(new AppThemeChangedEventArgs(interfaceStyle == "Dark" ? OSAppTheme.Dark : OSAppTheme.Light));
-			});
+					Application.Current?.TriggerThemeChanged(new AppThemeChangedEventArgs(interfaceStyle == "Dark" ? OSAppTheme.Dark : OSAppTheme.Light));
+				});
+			}
 
 			Device.SetIdiom(TargetIdiom.Desktop);
 			Device.SetFlowDirection(NSApplication.SharedApplication.UserInterfaceLayoutDirection.ToFlowDirection());
@@ -221,42 +240,42 @@ namespace Microsoft.Maui.Controls.Compatibility
 
 			Device.PlatformServices = platformServices;
 
+			// use field and not property to avoid exception in getter
+			if (Device.info is IDisposable infoDisposable)
+			{
+				infoDisposable.Dispose();
+				Device.info = null;
+			}
+
 #if __MOBILE__
 			Device.PlatformInvalidator = platformServices;
 			Device.Info = new IOSDeviceInfo();
 #else
 			Device.Info = new Platform.macOS.MacDeviceInfo();
 #endif
-			if(!IsInitializedRenderers)
-			{
-				IsInitializedRenderers = true;
-				Controls.Internals.Registrar.RegisterAll(new[]
-					{ typeof(ExportRendererAttribute), typeof(ExportCellAttribute), typeof(ExportImageSourceHandlerAttribute), typeof(ExportFontAttribute) });
-			}
+			if (maybeOptions?.Flags.HasFlag(InitializationFlags.SkipRenderers) != true)
+				RegisterCompatRenderers();
 
 			ExpressionSearch.Default = new iOSExpressionSearch();
+
+			IsInitialized = true;
 		}
-		internal static void RegisterCompatRenderers(
-			Assembly[] assemblies,
-			Assembly defaultRendererAssembly,
-			Action<Type> viewRegistered)
+
+		internal static void RegisterCompatRenderers()
 		{
-			if (IsInitializedRenderers)
-				return;
+			if (!IsInitializedRenderers)
+			{
+				IsInitializedRenderers = true;
 
-			IsInitializedRenderers = true;
-
-			// Only need to do this once
-			Controls.Internals.Registrar.RegisterAll(
-				assemblies,
-				defaultRendererAssembly,
-				new[] {
-						typeof(ExportRendererAttribute),
-						typeof(ExportCellAttribute),
-						typeof(ExportImageSourceHandlerAttribute),
-						typeof(ExportFontAttribute)
-					}, default(InitializationFlags),
-				viewRegistered);
+				// Only need to do this once
+				Controls.Internals.Registrar.RegisterAll(new[]
+				{
+					typeof(ExportRendererAttribute),
+					typeof(ExportCellAttribute),
+					typeof(ExportImageSourceHandlerAttribute),
+					typeof(ExportFontAttribute)
+				});
+			}
 		}
 
 		public static event EventHandler<ViewInitializedEventArgs> ViewInitialized;
@@ -313,11 +332,6 @@ namespace Microsoft.Maui.Controls.Compatibility
 				NSRunLoop.Main.BeginInvokeOnMainThread(action.Invoke);
 			}
 
-			public Ticker CreateTicker()
-			{
-				return new CADisplayLinkTicker();
-			}
-
 			public Assembly[] GetAssemblies()
 			{
 				return AppDomain.CurrentDomain.GetAssemblies();
@@ -325,15 +339,13 @@ namespace Microsoft.Maui.Controls.Compatibility
 
 			public string GetHash(string input) => Crc64.GetHash(input);
 
-			string IPlatformServices.GetMD5Hash(string input) => GetHash(input);
-
 			public double GetNamedSize(NamedSize size, Type targetElementType, bool useOldSizes)
 			{
 				// We make these up anyway, so new sizes didn't really change
 				// iOS docs say default button font size is 15, default label font size is 17 so we use those as the defaults.
 				var scalingFactor = _fontScalingFactor;
 
-				if (Application.Current?.On<iOS>().GetEnableAccessibilityScalingForNamedFontSizes() == false)
+				if (Application.Current?.On<PlatformConfiguration.iOS>().GetEnableAccessibilityScalingForNamedFontSizes() == false)
 				{
 					scalingFactor = 1;
 				}
@@ -387,7 +399,7 @@ namespace Microsoft.Maui.Controls.Compatibility
 
 				// If not iOS 13, but 11+ we can only get the named colors
 				if (!IsiOS13OrNewer && IsiOS11OrNewer)
-					return (resultColor = UIColor.FromName(name)) == null ? Color.Default : resultColor.ToColor();
+					return (resultColor = UIColor.FromName(name)) == null ? null : resultColor.ToColor();
 
 				// If iOS 13+ check all dynamic colors too
 				switch (name)
@@ -467,7 +479,7 @@ namespace Microsoft.Maui.Controls.Compatibility
 				}
 
 				if (resultColor == null)
-					return Color.Default;
+					return null;
 
 				return resultColor.ToColor();
 #elif __MACOS__
@@ -638,11 +650,11 @@ namespace Microsoft.Maui.Controls.Compatibility
 				}
 
 				if (resultColor == null)
-					return Color.Default;
+					return null;
 
 				return resultColor.ToColor(NSColorSpace.GenericRGBColorSpace);
 #else
-				return Color.Default;
+				return null;
 #endif
 			}
 
@@ -796,7 +808,7 @@ namespace Microsoft.Maui.Controls.Compatibility
 							return OSAppTheme.Unspecified;
 					};
 #else
-                    return AppearanceIsDark() ? OSAppTheme.Dark : OSAppTheme.Light;
+					return AppearanceIsDark() ? OSAppTheme.Dark : OSAppTheme.Light;
 #endif
 				}
 			}

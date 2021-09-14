@@ -1,26 +1,23 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Maui;
-using Microsoft.Maui.Hosting;
+﻿using Microsoft.Maui;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Maui.Controls.Sample.SingleProject
 {
-	public class MyApp : MauiApp
+	public class MyApp : IApplication
 	{
-		public override IAppHostBuilder CreateBuilder() => 
-			base.CreateBuilder().ConfigureServices((ctx, services) =>
-				{
-					services.AddTransient<MainPage>();
-					services.AddTransient<IWindow, MainWindow>();
-				});
+		List<IWindow> _windows = new List<IWindow>();
+		public IReadOnlyList<IWindow> Windows => _windows.AsReadOnly();
 
-		public override IWindow CreateWindow(IActivationState state)
+		public IWindow CreateWindow(IActivationState activationState)
 		{
-#if (ANDROID || IOS)
-
-			// This will probably go into a compatibility app or window
-			Microsoft.Maui.Controls.Compatibility.Forms.Init(state);
-#endif
-			return Services.GetService<IWindow>();
+			var window = new MainWindow();
+			_windows.Add(window);
+			return window;
+		}
+		
+		public void ThemeChanged()
+		{
 		}
 	}
 }

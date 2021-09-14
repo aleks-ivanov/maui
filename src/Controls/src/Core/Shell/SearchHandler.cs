@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Input;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
 using static Microsoft.Maui.Controls.VisualElement;
 
 namespace Microsoft.Maui.Controls
@@ -131,6 +132,8 @@ namespace Microsoft.Maui.Controls
 
 		public static readonly BindableProperty FontAttributesProperty = FontElement.FontAttributesProperty;
 
+		public static readonly BindableProperty FontAutoScalingEnabledProperty = FontElement.FontAutoScalingEnabledProperty;
+
 		public static readonly BindableProperty PlaceholderProperty = PlaceholderElement.PlaceholderProperty;
 
 		public static readonly BindableProperty PlaceholderColorProperty = PlaceholderElement.PlaceholderColorProperty;
@@ -175,11 +178,17 @@ namespace Microsoft.Maui.Controls
 			set { SetValue(TextElement.CharacterSpacingProperty, value); }
 		}
 
-		[TypeConverter(typeof(FontSizeConverter))]
+		[System.ComponentModel.TypeConverter(typeof(FontSizeConverter))]
 		public double FontSize
 		{
 			get { return (double)GetValue(FontSizeProperty); }
 			set { SetValue(FontSizeProperty, value); }
+		}
+
+		public bool FontAutoScalingEnabled
+		{
+			get => (bool)GetValue(FontAutoScalingEnabledProperty);
+			set => SetValue(FontAutoScalingEnabledProperty, value);
 		}
 
 		void IFontElement.OnFontFamilyChanged(string oldValue, string newValue)
@@ -187,6 +196,10 @@ namespace Microsoft.Maui.Controls
 		}
 
 		void IFontElement.OnFontSizeChanged(double oldValue, double newValue)
+		{
+		}
+
+		void IFontElement.OnFontAutoScalingEnabledChanged(bool oldValue, bool newValue)
 		{
 		}
 
@@ -213,7 +226,7 @@ namespace Microsoft.Maui.Controls
 			set => SetValue(PlaceholderElement.PlaceholderProperty, value);
 		}
 
-		public static readonly BindableProperty BackgroundColorProperty = BindableProperty.Create(nameof(BackgroundColor), typeof(Color), typeof(SearchHandler), Color.Default);
+		public static readonly BindableProperty BackgroundColorProperty = BindableProperty.Create(nameof(BackgroundColor), typeof(Color), typeof(SearchHandler), null);
 
 		public Color BackgroundColor
 		{

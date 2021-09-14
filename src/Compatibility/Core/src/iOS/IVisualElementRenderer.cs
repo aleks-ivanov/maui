@@ -1,4 +1,6 @@
 using System;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Graphics;
 #if __MOBILE__
 using UIKit;
 using NativeView = UIKit.UIView;

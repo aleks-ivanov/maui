@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls.CustomAttributes;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
+using AbsoluteLayoutFlags = Microsoft.Maui.Layouts.AbsoluteLayoutFlags;
 
 #if UITEST
 using Microsoft.Maui.Controls.Compatibility.UITests;
@@ -27,7 +29,7 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.Issues
 		{
 			AbsoluteLayout mainLayout = new AbsoluteLayout()
 			{
-				BackgroundColor = Color.White,
+				BackgroundColor = Colors.White,
 				AutomationId = White
 			};
 
@@ -36,13 +38,13 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.Issues
 
 			var thePage = new ContentView
 			{
-				BackgroundColor = Color.Red,
+				BackgroundColor = Colors.Red,
 				Content = mainLayout
 			};
 
 			BoxView view = new BoxView()
 			{
-				Color = Color.Black,
+				Color = Colors.Black,
 				AutomationId = Black
 			};
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Maui.Controls.Build.Tasks;
 using Microsoft.Maui.Controls.Xaml;
+using Microsoft.Maui.Graphics;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -32,21 +33,21 @@ namespace Microsoft.Maui.Controls.XamlC
 			if (!hasW && xywh.Length == 4 && string.Compare("AutoSize", xywh[2].Trim(), StringComparison.OrdinalIgnoreCase) == 0)
 			{
 				hasW = true;
-				w = AbsoluteLayout.AutoSize;
+				w = Compatibility.AbsoluteLayout.AutoSize;
 			}
 
 			if (!hasH && xywh.Length == 4 && string.Compare("AutoSize", xywh[3].Trim(), StringComparison.OrdinalIgnoreCase) == 0)
 			{
 				hasH = true;
-				h = AbsoluteLayout.AutoSize;
+				h = Compatibility.AbsoluteLayout.AutoSize;
 			}
 
 			if (hasX && hasY && xywh.Length == 2)
 			{
 				hasW = true;
-				w = AbsoluteLayout.AutoSize;
+				w = Compatibility.AbsoluteLayout.AutoSize;
 				hasH = true;
-				h = AbsoluteLayout.AutoSize;
+				h = Compatibility.AbsoluteLayout.AutoSize;
 			}
 
 			if (!hasX || !hasY || !hasW || !hasH)
@@ -67,7 +68,7 @@ namespace Microsoft.Maui.Controls.XamlC
 			yield return Instruction.Create(OpCodes.Ldc_R8, y);
 			yield return Instruction.Create(OpCodes.Ldc_R8, w);
 			yield return Instruction.Create(OpCodes.Ldc_R8, h);
-			yield return Instruction.Create(OpCodes.Newobj, module.ImportCtorReference(("Microsoft.Maui", "Microsoft.Maui", "Rectangle"), parameterTypes: new[] {
+			yield return Instruction.Create(OpCodes.Newobj, module.ImportCtorReference(("Microsoft.Maui.Graphics", "Microsoft.Maui.Graphics", "Rectangle"), parameterTypes: new[] {
 				("mscorlib", "System", "Double"),
 				("mscorlib", "System", "Double"),
 				("mscorlib", "System", "Double"),

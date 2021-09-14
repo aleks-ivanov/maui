@@ -1,13 +1,19 @@
+#nullable enable
 namespace Microsoft.Maui.Handlers
 {
-	public partial class ButtonHandler
+	public sealed partial class ButtonHandler
 	{
-		public static PropertyMapper<IButton, ButtonHandler> ButtonMapper = new PropertyMapper<IButton, ButtonHandler>(ViewHandler.ViewMapper)
+		readonly ImageSourceServiceResultManager _sourceManager = new ImageSourceServiceResultManager();
+
+		public static IPropertyMapper<IButton, ButtonHandler> ButtonMapper = new PropertyMapper<IButton, ButtonHandler>(ViewHandler.ViewMapper)
 		{
+			[nameof(IButton.Background)] = MapBackground,
+			[nameof(IButton.CharacterSpacing)] = MapCharacterSpacing,
+			[nameof(IButton.Font)] = MapFont,
+			[nameof(IButton.Padding)] = MapPadding,
 			[nameof(IButton.Text)] = MapText,
 			[nameof(IButton.TextColor)] = MapTextColor,
-			[nameof(ILabel.Font)] = MapFont,
-			[nameof(IButton.Padding)] = MapPadding,
+			[nameof(IButton.ImageSource)] = MapImageSource
 		};
 
 		public ButtonHandler() : base(ButtonMapper)
@@ -15,7 +21,7 @@ namespace Microsoft.Maui.Handlers
 
 		}
 
-		public ButtonHandler(PropertyMapper mapper) : base(mapper ?? ButtonMapper)
+		public ButtonHandler(IPropertyMapper? mapper = null) : base(mapper ?? ButtonMapper)
 		{
 		}
 	}

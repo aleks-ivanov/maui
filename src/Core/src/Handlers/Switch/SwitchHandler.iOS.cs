@@ -4,7 +4,7 @@ using RectangleF = CoreGraphics.CGRect;
 
 namespace Microsoft.Maui.Handlers
 {
-	public partial class SwitchHandler : AbstractViewHandler<ISwitch, UISwitch>
+	public partial class SwitchHandler : ViewHandler<ISwitch, UISwitch>
 	{
 		static UIColor? DefaultOnTrackColor;
 		static UIColor? DefaultOffTrackColor;
@@ -17,34 +17,38 @@ namespace Microsoft.Maui.Handlers
 
 		protected override void ConnectHandler(UISwitch nativeView)
 		{
+			base.ConnectHandler(nativeView);
+
 			nativeView.ValueChanged += OnControlValueChanged;
 		}
 
 		protected override void DisconnectHandler(UISwitch nativeView)
 		{
+			base.DisconnectHandler(nativeView);
+
 			nativeView.ValueChanged -= OnControlValueChanged;
 		}
 
-		protected override void SetupDefaults(UISwitch nativeView)
+		void SetupDefaults(UISwitch nativeView)
 		{
 			DefaultOnTrackColor = UISwitch.Appearance.OnTintColor;
 			DefaultOffTrackColor = nativeView.GetOffTrackColor();
 			DefaultThumbColor = UISwitch.Appearance.ThumbTintColor;
 		}
 
-		public static void MapIsToggled(SwitchHandler handler, ISwitch view)
+		public static void MapIsOn(SwitchHandler handler, ISwitch view)
 		{
-			handler.TypedNativeView?.UpdateIsToggled(view);
+			handler.NativeView?.UpdateIsOn(view);
 		}
 
 		public static void MapTrackColor(SwitchHandler handler, ISwitch view)
 		{
-			handler.TypedNativeView?.UpdateTrackColor(view, DefaultOnTrackColor, DefaultOffTrackColor);
+			handler.NativeView?.UpdateTrackColor(view, DefaultOnTrackColor, DefaultOffTrackColor);
 		}
 
 		public static void MapThumbColor(SwitchHandler handler, ISwitch view)
 		{
-			handler.TypedNativeView?.UpdateThumbColor(view, DefaultThumbColor);
+			handler.NativeView?.UpdateThumbColor(view, DefaultThumbColor);
 		}
 
 		void OnControlValueChanged(object? sender, EventArgs e)
@@ -52,8 +56,8 @@ namespace Microsoft.Maui.Handlers
 			if (VirtualView == null)
 				return;
 
-			if (TypedNativeView != null)
-				VirtualView.IsToggled = TypedNativeView.On;
+			if (NativeView != null)
+				VirtualView.IsOn = NativeView.On;
 		}
 	}
 }

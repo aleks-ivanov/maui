@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using Microsoft.Maui.Controls.CustomAttributes;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
+using AbsoluteLayoutFlags = Microsoft.Maui.Layouts.AbsoluteLayoutFlags;
 
 namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.Issues
 {
@@ -96,7 +98,7 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.Issues
 				var nameLabel = new Label();
 				var verticaLayout = new StackLayout();
 				Microsoft.Maui.Controls.CompressedLayout.SetIsHeadless(verticaLayout, TestPage.ShouldUseCompressedLayout);
-				var horizontalLayout = new StackLayout() { BackgroundColor = Color.Olive };
+				var horizontalLayout = new StackLayout() { BackgroundColor = Colors.Olive };
 
 				nameLabel.SetBinding(Label.TextProperty, new Binding("Name"));
 

@@ -2,7 +2,7 @@ using System;
 
 namespace Microsoft.Maui.Handlers
 {
-	public partial class SliderHandler : AbstractViewHandler<ISlider, object>
+	public partial class SliderHandler : ViewHandler<ISlider, object>
 	{
 		protected override object CreateNativeView() => throw new NotImplementedException();
 
@@ -12,5 +12,6 @@ namespace Microsoft.Maui.Handlers
 		public static void MapMinimumTrackColor(IViewHandler handler, ISlider slider) { }
 		public static void MapMaximumTrackColor(IViewHandler handler, ISlider slider) { }
 		public static void MapThumbColor(IViewHandler handler, ISlider slider) { }
+		public static void MapThumbImageSource(IViewHandler handler, ISlider slider) { }
 	}
 }

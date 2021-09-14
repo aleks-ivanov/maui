@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls
 {
@@ -43,6 +44,7 @@ namespace Microsoft.Maui.Controls
 			set => SetValue(TextProperty, value);
 		}
 
+		[System.ComponentModel.TypeConverter(typeof(Converters.KeyboardTypeConverter))]
 		public Keyboard Keyboard
 		{
 			get => (Keyboard)GetValue(KeyboardProperty);

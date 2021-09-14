@@ -1,6 +1,6 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Microsoft.Maui
 {
@@ -24,17 +24,22 @@ namespace Microsoft.Maui
 		{
 			_ = input ?? throw new ArgumentNullException(nameof(input));
 
-			var hashIndex = input.IndexOf("#", System.StringComparison.Ordinal);
+			var hashIndex = input.IndexOf("#", global::System.StringComparison.Ordinal);
 			//UWP names require Spaces. Sometimes people may use those, "CuteFont-Regular#Cute Font" should be "CuteFont-Regular#CuteFont"
 			var postScriptName = hashIndex > 0 ? input.Substring(hashIndex + 1).Replace(" ", "") : input;
 			//Get the fontFamily name;
 			var fontFamilyName = hashIndex > 0 ? input.Substring(0, hashIndex) : input;
 
-			var foundExtension = Extensions.
-				FirstOrDefault(x => fontFamilyName.EndsWith(x, StringComparison.OrdinalIgnoreCase));
-
-			if (!string.IsNullOrWhiteSpace(foundExtension))
-				fontFamilyName = fontFamilyName.Substring(0, fontFamilyName.Length - foundExtension.Length);
+			string? foundExtension = null;
+			foreach (var extension in Extensions)
+			{
+				if (fontFamilyName.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
+				{
+					foundExtension = extension;
+					fontFamilyName = fontFamilyName.Substring(0, fontFamilyName.Length - foundExtension.Length);
+					break;
+				}
+			}
 
 			return new FontFile
 			{

@@ -2,10 +2,11 @@ using System;
 using System.ComponentModel;
 using System.Windows.Input;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls
 {
-	public class SearchBar : InputView, IFontElement, ITextAlignmentElement, ISearchBarController, IElementConfiguration<SearchBar>
+	public partial class SearchBar : InputView, IFontElement, ITextAlignmentElement, ISearchBarController, IElementConfiguration<SearchBar>
 	{
 		public static readonly BindableProperty SearchCommandProperty = BindableProperty.Create("SearchCommand", typeof(ICommand), typeof(SearchBar), null, propertyChanged: OnCommandChanged);
 
@@ -24,6 +25,8 @@ namespace Microsoft.Maui.Controls
 		public static readonly BindableProperty FontSizeProperty = FontElement.FontSizeProperty;
 
 		public static readonly BindableProperty FontAttributesProperty = FontElement.FontAttributesProperty;
+
+		public static readonly BindableProperty FontAutoScalingEnabledProperty = FontElement.FontAutoScalingEnabledProperty;
 
 		public static readonly BindableProperty HorizontalTextAlignmentProperty = TextAlignmentElement.HorizontalTextAlignmentProperty;
 
@@ -82,30 +85,40 @@ namespace Microsoft.Maui.Controls
 			set { SetValue(FontFamilyProperty, value); }
 		}
 
-		[TypeConverter(typeof(FontSizeConverter))]
+		[System.ComponentModel.TypeConverter(typeof(FontSizeConverter))]
 		public double FontSize
 		{
 			get { return (double)GetValue(FontSizeProperty); }
 			set { SetValue(FontSizeProperty, value); }
 		}
 
-		void IFontElement.OnFontFamilyChanged(string oldValue, string newValue)
+		public bool FontAutoScalingEnabled
 		{
-		}
-
-		void IFontElement.OnFontSizeChanged(double oldValue, double newValue)
-		{
+			get => (bool)GetValue(FontAutoScalingEnabledProperty);
+			set => SetValue(FontAutoScalingEnabledProperty, value);
 		}
 
 		double IFontElement.FontSizeDefaultValueCreator() =>
 			Device.GetNamedSize(NamedSize.Default, (SearchBar)this);
 
-		void IFontElement.OnFontAttributesChanged(FontAttributes oldValue, FontAttributes newValue)
-		{
-		}
+		void IFontElement.OnFontAttributesChanged(FontAttributes oldValue, FontAttributes newValue) =>
+			HandleFontChanged();
 
-		void IFontElement.OnFontChanged(Font oldValue, Font newValue)
+		void IFontElement.OnFontFamilyChanged(string oldValue, string newValue) =>
+			HandleFontChanged();
+
+		void IFontElement.OnFontSizeChanged(double oldValue, double newValue) =>
+			HandleFontChanged();
+
+		void IFontElement.OnFontChanged(Font oldValue, Font newValue) =>
+			HandleFontChanged();
+
+		void IFontElement.OnFontAutoScalingEnabledChanged(bool oldValue, bool newValue) =>
+			HandleFontChanged();
+
+		void HandleFontChanged()
 		{
+			InvalidateMeasureInternal(InvalidationTrigger.MeasureChanged);
 		}
 
 		public event EventHandler SearchButtonPressed;

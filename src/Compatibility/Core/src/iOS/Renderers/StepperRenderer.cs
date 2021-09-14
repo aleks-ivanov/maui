@@ -1,6 +1,7 @@
 using System;
-using System.Drawing;
 using System.ComponentModel;
+using System.Drawing;
+using Microsoft.Maui.Controls.Platform;
 using UIKit;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
@@ -8,7 +9,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 	public class StepperRenderer : ViewRenderer<Stepper, UIStepper>
 	{
 		bool _disposed;
-	
+
 		[Microsoft.Maui.Controls.Internals.Preserve(Conditional = true)]
 		public StepperRenderer()
 		{
@@ -23,7 +24,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 
 			_disposed = true;
 
-			if(disposing)
+			if (disposing)
 			{
 				if (Control != null)
 					Control.ValueChanged -= OnValueChanged;
@@ -65,26 +66,31 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 				UpdateIncrement();
 		}
 
+		[PortHandler]
 		void OnValueChanged(object sender, EventArgs e)
 		{
 			((IElementController)Element).SetValueFromRenderer(Stepper.ValueProperty, Control.Value);
 		}
 
+		[PortHandler]
 		void UpdateIncrement()
 		{
 			Control.StepValue = Element.Increment;
 		}
 
+		[PortHandler]
 		void UpdateMaximum()
 		{
 			Control.MaximumValue = Element.Maximum;
 		}
 
+		[PortHandler]
 		void UpdateMinimum()
 		{
 			Control.MinimumValue = Element.Minimum;
 		}
 
+		[PortHandler]
 		void UpdateValue()
 		{
 			if (Control.Value != Element.Value)

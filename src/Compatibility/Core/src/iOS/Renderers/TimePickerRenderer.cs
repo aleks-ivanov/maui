@@ -3,8 +3,10 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using Foundation;
-using UIKit;
+using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;
+using Microsoft.Maui.Platform.iOS;
+using UIKit;
 using RectangleF = CoreGraphics.CGRect;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
@@ -17,6 +19,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 
 		}
 
+		[PortHandler]
 		protected override UITextField CreateNativeControl()
 		{
 			return new NoCaretField { BorderStyle = UITextBorderStyle.RoundedRect };
@@ -175,16 +178,18 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 			(Control as UITextField).UpdateTextAlignment(Element);
 		}
 
+		[PortHandler]
 		protected internal virtual void UpdateFont()
 		{
 			Control.Font = Element.ToUIFont();
 		}
 
+		[PortHandler]
 		protected internal virtual void UpdateTextColor()
 		{
 			var textColor = Element.TextColor;
 
-			if (textColor.IsDefault || (!Element.IsEnabled && _useLegacyColorManagement))
+			if (textColor == null || (!Element.IsEnabled && _useLegacyColorManagement))
 				Control.TextColor = _defaultTextColor;
 			else
 				Control.TextColor = textColor.ToUIColor();
@@ -193,14 +198,16 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 			Control.Text = Control.Text;
 		}
 
+		[PortHandler]
 		void UpdateCharacterSpacing()
 		{
-			var textAttr = Control.AttributedText.AddCharacterSpacing(Control.Text, Element.CharacterSpacing);
+			var textAttr = Control.AttributedText.WithCharacterSpacing(Element.CharacterSpacing);
 
 			if (textAttr != null)
 				Control.AttributedText = textAttr;
 		}
 
+		[PortHandler]
 		void UpdateTime()
 		{
 			_picker.Date = new DateTime(1, 1, 1).Add(Element.Time).ToNSDate();
@@ -209,7 +216,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 							  .Where(c => c.Name.EndsWith("-" + iOSLocale)).FirstOrDefault();
 			if (cultureInfos == null)
 				cultureInfos = CultureInfo.InvariantCulture;
-			
+
 			if (String.IsNullOrEmpty(Element.Format))
 			{
 				string timeformat = cultureInfos.DateTimeFormat.ShortTimePattern;
@@ -237,6 +244,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.iOS
 			Element.InvalidateMeasureNonVirtual(Controls.Internals.InvalidationTrigger.MeasureChanged);
 		}
 
+		[PortHandler]
 		void UpdateElementTime()
 		{
 			ElementController.SetValueFromRenderer(TimePicker.TimeProperty, _picker.Date.ToDateTime() - new DateTime(1, 1, 1));

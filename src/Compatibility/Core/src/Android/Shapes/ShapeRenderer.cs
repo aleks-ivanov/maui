@@ -1,15 +1,20 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Graphics.Drawables.Shapes;
+using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Controls.Shapes;
+using Microsoft.Maui.Graphics;
 using AColor = Android.Graphics.Color;
 using AMatrix = Android.Graphics.Matrix;
 using APath = Android.Graphics.Path;
+using AShapeDrawable = Android.Graphics.Drawables.ShapeDrawable;
 using AView = Android.Views.View;
+using Paint = Android.Graphics.Paint;
 using Shape = Microsoft.Maui.Controls.Shapes.Shape;
+
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 {
@@ -180,7 +185,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 
 	public class ShapeView : AView
 	{
-		readonly ShapeDrawable _drawable;
+		readonly AShapeDrawable _drawable;
 		protected float _density;
 
 		APath _path;
@@ -203,7 +208,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 
 		public ShapeView(Context context) : base(context)
 		{
-			_drawable = new ShapeDrawable(null);
+			_drawable = new AShapeDrawable(null);
 			_drawable.Paint.AntiAlias = true;
 
 			_density = Resources.DisplayMetrics.Density;
@@ -243,9 +248,9 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 				}
 				else
 				{
-					AColor fillColor = Color.Default.ToAndroid();
+					AColor fillColor = Colors.Transparent.ToAndroid();
 
-					if (_fill is SolidColorBrush solidColorBrush && solidColorBrush.Color != Color.Default)
+					if (_fill is SolidColorBrush solidColorBrush && solidColorBrush.Color != null)
 						fillColor = solidColorBrush.Color.ToAndroid();
 
 					_drawable.Paint.Color = fillColor;
@@ -273,9 +278,9 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 				}
 				else
 				{
-					AColor strokeColor = Color.Default.ToAndroid();
+					AColor strokeColor = Graphics.Colors.Transparent.ToAndroid();
 
-					if (_stroke is SolidColorBrush solidColorBrush && solidColorBrush.Color != Color.Default)
+					if (_stroke is SolidColorBrush solidColorBrush && solidColorBrush.Color != null)
 						strokeColor = solidColorBrush.Color.ToAndroid();
 
 					_drawable.Paint.Color = strokeColor;
@@ -518,8 +523,8 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 				return null;
 
 			int gradientStopsCount = radialGradientBrush.GradientStops.Count;
-			AColor centerColor = gradientStopsCount > 0 ? radialGradientBrush.GradientStops[0].Color.ToAndroid() : Color.Default.ToAndroid();
-			AColor edgeColor = gradientStopsCount > 0 ? radialGradientBrush.GradientStops[gradientStopsCount - 1].Color.ToAndroid() : Color.Default.ToAndroid();
+			AColor centerColor = gradientStopsCount > 0 ? radialGradientBrush.GradientStops[0].Color.ToAndroid() : Colors.Transparent.ToAndroid();
+			AColor edgeColor = gradientStopsCount > 0 ? radialGradientBrush.GradientStops[gradientStopsCount - 1].Color.ToAndroid() : Colors.Transparent.ToAndroid();
 
 			float[] offsets = new float[radialGradientBrush.GradientStops.Count];
 

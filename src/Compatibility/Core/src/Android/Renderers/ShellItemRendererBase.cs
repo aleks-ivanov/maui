@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Android.Views;
 using AndroidX.Fragment.App;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 {
@@ -14,9 +16,9 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 	{
 		#region IShellItemRenderer
 
-		Fragment IShellItemRenderer.Fragment => this;
+		Fragment IShellItemView.Fragment => this;
 
-		ShellItem IShellItemRenderer.ShellItem
+		ShellItem IShellItemView.ShellItem
 		{
 			get { return ShellItem; }
 			set { ShellItem = value; }
@@ -248,7 +250,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 
 			if (animated && trackFragment != null)
 			{
-				GetNavigationTarget().SetBackgroundColor(Color.Black.ToAndroid());
+				GetNavigationTarget().SetBackgroundColor(Colors.Black.ToAndroid());
 				void callback(object s, EventArgs e)
 				{
 					trackFragment.AnimationFinished -= callback;

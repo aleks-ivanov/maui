@@ -5,16 +5,17 @@ using AView = Android.Views.View;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 {
+	[PortHandler]
 	public static class StepperRendererManager
 	{
 		public static void CreateStepperButtons<TButton>(IStepperRenderer renderer, out TButton downButton, out TButton upButton)
 			where TButton : AButton
 		{
 			downButton = (TButton)renderer.CreateButton();
-			downButton.Id = AppCompat.Platform.GenerateViewId();
+			downButton.Id = Platform.GenerateViewId();
 			downButton.Focusable = true;
 			upButton = (TButton)renderer.CreateButton();
-			upButton.Id = AppCompat.Platform.GenerateViewId();
+			upButton.Id = Platform.GenerateViewId();
 			upButton.Focusable = true;
 
 			downButton.Gravity = GravityFlags.Center;

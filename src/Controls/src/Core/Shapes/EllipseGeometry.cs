@@ -1,3 +1,5 @@
+using Microsoft.Maui.Graphics;
+
 namespace Microsoft.Maui.Controls.Shapes
 {
 	public class EllipseGeometry : Geometry
@@ -39,6 +41,14 @@ namespace Microsoft.Maui.Controls.Shapes
 		{
 			set { SetValue(RadiusYProperty, value); }
 			get { return (double)GetValue(RadiusYProperty); }
+		}
+
+		public override void AppendPath(PathF path)
+		{
+			var radiusX = (float)RadiusX;
+			var radiusY = (float)RadiusY;
+
+			path.AppendEllipse((float)Center.X - radiusX, (float)Center.Y - radiusY, radiusX * 2f, radiusY * 2f);
 		}
 	}
 }

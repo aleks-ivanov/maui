@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Controls.Xaml.Diagnostics;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls
 {
@@ -120,13 +121,7 @@ namespace Microsoft.Maui.Controls
 			VisualDiagnostics.OnChildRemoved(this, element, oldLogicalIndex);
 		}
 
-#if NETSTANDARD1_0
-		ReadOnlyCollection<Element> _readOnlyLogicalChildren;
-		internal override ReadOnlyCollection<Element> LogicalChildrenInternal => _readOnlyLogicalChildren ?? 
-			(_readOnlyLogicalChildren = new ReadOnlyCollection<Element>(_logicalChildren));
-#else
-		internal override ReadOnlyCollection<Element> LogicalChildrenInternal => _logicalChildren.AsReadOnly();
-#endif
+		internal override IReadOnlyList<Element> LogicalChildrenInternal => _logicalChildren.AsReadOnly();
 
 		internal static readonly BindableProperty InternalItemsLayoutProperty =
 			BindableProperty.Create(nameof(ItemsLayout), typeof(IItemsLayout), typeof(ItemsView),

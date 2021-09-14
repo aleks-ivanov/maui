@@ -2,6 +2,8 @@ using System.ComponentModel;
 using Android.Content;
 using Android.Content.Res;
 using Android.OS;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Graphics;
 using AProgressBar = Android.Widget.ProgressBar;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
@@ -52,6 +54,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 				UpdateProgressColor();
 		}
 
+		[PortHandler]
 		internal virtual protected void UpdateProgressColor()
 		{
 			if (Element == null || Control == null)
@@ -59,7 +62,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 
 			Color color = Element.ProgressColor;
 
-			if (color.IsDefault)
+			if (color == null)
 			{
 				(Control.Indeterminate ? Control.IndeterminateDrawable :
 					Control.ProgressDrawable).ClearColorFilter();

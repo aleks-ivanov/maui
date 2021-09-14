@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Windows.Input;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls
 {
@@ -94,7 +95,7 @@ namespace Microsoft.Maui.Controls
 			set { SetValue(CommandParameterProperty, value); }
 		}
 
-		[TypeConverter(typeof(ImageSourceConverter))]
+		[System.ComponentModel.TypeConverter(typeof(ImageSourceConverter))]
 		public ImageSource Source
 		{
 			get { return (ImageSource)GetValue(SourceProperty); }

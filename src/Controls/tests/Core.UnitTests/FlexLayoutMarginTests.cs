@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Layouts;
 using NUnit.Framework;
 
 namespace Microsoft.Maui.Controls.Core.UnitTests
 {
+	using FlexLayout = Microsoft.Maui.Controls.Compatibility.FlexLayout;
+
 	public class FlexLayoutMarginTests : BaseTestFixture
 	{
 		[Test]

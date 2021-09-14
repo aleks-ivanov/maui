@@ -1,15 +1,17 @@
+#nullable enable
 namespace Microsoft.Maui.Handlers
 {
 	public partial class SliderHandler
 	{
-		public static PropertyMapper<ISlider, SliderHandler> SliderMapper = new PropertyMapper<ISlider, SliderHandler>(ViewHandler.ViewMapper)
+		public static IPropertyMapper<ISlider, SliderHandler> SliderMapper = new PropertyMapper<ISlider, SliderHandler>(ViewHandler.ViewMapper)
 		{
-			[nameof(ISlider.Minimum)] = MapMinimum,
 			[nameof(ISlider.Maximum)] = MapMaximum,
-			[nameof(ISlider.Value)] = MapValue,
-			[nameof(ISlider.MinimumTrackColor)] = MapMinimumTrackColor,
 			[nameof(ISlider.MaximumTrackColor)] = MapMaximumTrackColor,
-			[nameof(ISlider.ThumbColor)] = MapThumbColor
+			[nameof(ISlider.Minimum)] = MapMinimum,
+			[nameof(ISlider.MinimumTrackColor)] = MapMinimumTrackColor,
+			[nameof(ISlider.ThumbColor)] = MapThumbColor,
+			[nameof(ISlider.ThumbImageSource)] = MapThumbImageSource,
+			[nameof(ISlider.Value)] = MapValue,
 		};
 
 		public SliderHandler() : base(SliderMapper)
@@ -17,7 +19,7 @@ namespace Microsoft.Maui.Handlers
 
 		}
 
-		public SliderHandler(PropertyMapper mapper) : base(mapper ?? SliderMapper)
+		public SliderHandler(IPropertyMapper? mapper = null) : base(mapper ?? SliderMapper)
 		{
 
 		}

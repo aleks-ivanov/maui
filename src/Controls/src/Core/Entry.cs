@@ -23,6 +23,8 @@ namespace Microsoft.Maui.Controls
 
 		public new static readonly BindableProperty TextColorProperty = InputView.TextColorProperty;
 
+		public new static readonly BindableProperty KeyboardProperty = InputView.KeyboardProperty;
+
 		public new static readonly BindableProperty CharacterSpacingProperty = InputView.CharacterSpacingProperty;
 
 		public static readonly BindableProperty HorizontalTextAlignmentProperty = TextAlignmentElement.HorizontalTextAlignmentProperty;
@@ -34,6 +36,8 @@ namespace Microsoft.Maui.Controls
 		public static readonly BindableProperty FontSizeProperty = FontElement.FontSizeProperty;
 
 		public static readonly BindableProperty FontAttributesProperty = FontElement.FontAttributesProperty;
+
+		public static readonly BindableProperty FontAutoScalingEnabledProperty = FontElement.FontAutoScalingEnabledProperty;
 
 		public static readonly BindableProperty IsTextPredictionEnabledProperty = BindableProperty.Create(nameof(IsTextPredictionEnabled), typeof(bool), typeof(Entry), true, BindingMode.OneTime);
 
@@ -80,11 +84,17 @@ namespace Microsoft.Maui.Controls
 			set { SetValue(FontFamilyProperty, value); }
 		}
 
-		[TypeConverter(typeof(FontSizeConverter))]
+		[System.ComponentModel.TypeConverter(typeof(FontSizeConverter))]
 		public double FontSize
 		{
 			get { return (double)GetValue(FontSizeProperty); }
 			set { SetValue(FontSizeProperty, value); }
+		}
+
+		public bool FontAutoScalingEnabled
+		{
+			get => (bool)GetValue(FontAutoScalingEnabledProperty);
+			set => SetValue(FontAutoScalingEnabledProperty, value);
 		}
 
 		public bool IsTextPredictionEnabled
@@ -144,10 +154,11 @@ namespace Microsoft.Maui.Controls
 		void IFontElement.OnFontChanged(Font oldValue, Font newValue) =>
 			 HandleFontChanged();
 
+		void IFontElement.OnFontAutoScalingEnabledChanged(bool oldValue, bool newValue) =>
+			HandleFontChanged();
+
 		void HandleFontChanged()
 		{
-			// Null out the Maui font value so it will be recreated next time it's accessed
-			_font = null;
 			InvalidateMeasureInternal(InvalidationTrigger.MeasureChanged);
 		}
 

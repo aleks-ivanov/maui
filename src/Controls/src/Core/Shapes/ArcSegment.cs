@@ -1,3 +1,6 @@
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Graphics.Converters;
+
 namespace Microsoft.Maui.Controls.Shapes
 {
 	public class ArcSegment : PathSegment
@@ -37,7 +40,7 @@ namespace Microsoft.Maui.Controls.Shapes
 			get { return (Point)GetValue(PointProperty); }
 		}
 
-		[TypeConverter(typeof(SizeTypeConverter))]
+		[System.ComponentModel.TypeConverter(typeof(SizeTypeConverter))]
 		public Size Size
 		{
 			set { SetValue(SizeProperty, value); }

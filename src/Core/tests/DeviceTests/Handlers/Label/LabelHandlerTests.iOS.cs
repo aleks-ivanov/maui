@@ -1,7 +1,9 @@
+using System;
 using System.Threading.Tasks;
 using Foundation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.DeviceTests.Stubs;
+using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform.iOS;
 using UIKit;
@@ -11,31 +13,6 @@ namespace Microsoft.Maui.DeviceTests
 {
 	public partial class LabelHandlerTests
 	{
-		[Theory(DisplayName = "Font Family Initializes Correctly")]
-		[InlineData(null)]
-		[InlineData("Times New Roman")]
-		[InlineData("Dokdo")]
-		public async Task FontFamilyInitializesCorrectly(string family)
-		{
-			var label = new LabelStub()
-			{
-				Text = "Test",
-				Font = Font.OfSize(family, 10)
-			};
-
-			var nativeFont = await GetValueAsync(label, handler => GetNativeLabel(handler).Font);
-
-			var fontManager = App.Services.GetRequiredService<IFontManager>();
-
-			var expectedNativeFont = fontManager.GetFont(Font.OfSize(family, 0.0));
-
-			Assert.Equal(expectedNativeFont.FamilyName, nativeFont.FamilyName);
-			if (string.IsNullOrEmpty(family))
-				Assert.Equal(fontManager.DefaultFont.FamilyName, nativeFont.FamilyName);
-			else
-				Assert.NotEqual(fontManager.DefaultFont.FamilyName, nativeFont.FamilyName);
-		}
-
 		[Fact(DisplayName = "Horizontal TextAlignment Updates Correctly")]
 		public async Task HorizontalTextAlignmentInitializesCorrectly()
 		{
@@ -54,27 +31,12 @@ namespace Microsoft.Maui.DeviceTests
 				return new
 				{
 					ViewValue = labelStub.HorizontalTextAlignment,
-					NativeViewValue = GetNativeTextAlignment(handler)
+					NativeViewValue = GetNativeHorizontalTextAlignment(handler)
 				};
 			});
 
 			Assert.Equal(xplatHorizontalTextAlignment, values.ViewValue);
 			values.NativeViewValue.AssertHasFlag(expectedValue);
-		}
-
-		[Fact(DisplayName = "Negative MaxLines value with wrap is correct")]
-		public async Task NegativeMaxValueWithWrapIsCorrect()
-		{
-			var label = new LabelStub()
-			{
-				Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-				MaxLines = -1,
-				LineBreakMode = LineBreakMode.WordWrap,
-			};
-
-			var nativeValue = await GetValueAsync(label, GetNativeMaxLines);
-
-			Assert.Equal(0, nativeValue);
 		}
 
 		[Fact(DisplayName = "Padding Initializes Correctly")]
@@ -102,6 +64,7 @@ namespace Microsoft.Maui.DeviceTests
 
 			var labelHandler = new LabelStub()
 			{
+				Text = "Test", // Native values won't actually apply unless there's text
 				TextDecorations = xplatTextDecorations
 			};
 
@@ -110,31 +73,117 @@ namespace Microsoft.Maui.DeviceTests
 				return new
 				{
 					ViewValue = labelHandler.TextDecorations,
-					NativeViewValue = GetNativeTextDecorations(handler)
+					GetNativeLabel(handler).AttributedText
 				};
 			});
 
 			Assert.Equal(xplatTextDecorations, values.ViewValue);
-			Assert.NotNull(values.NativeViewValue);
+			values.AttributedText.AssertHasUnderline();
+		}
+
+		[Fact]
+		[Category(TestCategory.TextFormatting)]
+		public async Task CanSetAlignmentAndLineHeight()
+		{
+			// Verifying that setting LineHeight (which requires an attributed string on iOS)
+			// doesn't cancel out the text alignment value (which can be set without an attributed string)
+
+			var xplatHorizontalTextAlignment = TextAlignment.End;
+			double xplatLineHeight = 2;
+
+			var label = new LabelStub()
+			{
+				Text = "Test",
+				HorizontalTextAlignment = xplatHorizontalTextAlignment,
+				LineHeight = xplatLineHeight
+			};
+
+			var expectedAlignment = UITextAlignment.Right;
+			var expectedLineHeight = xplatLineHeight;
+
+			var handler = await CreateHandlerAsync(label);
+			var actualAlignment = await InvokeOnMainThreadAsync(() => GetNativeHorizontalTextAlignment(handler));
+			var actualLineHeight = await InvokeOnMainThreadAsync(() => GetNativeLineHeight(handler));
+
+			Assert.Equal(expectedLineHeight, actualLineHeight);
+			Assert.Equal(expectedAlignment, actualAlignment);
+		}
+
+		[Fact]
+		[Category(TestCategory.TextFormatting)]
+		public async Task TextDecorationsAppliedWhenTextAdded()
+		{
+			TextDecorations xplatTextDecorations = TextDecorations.Underline;
+
+			var label = new LabelStub() { TextDecorations = xplatTextDecorations }; // No text set
+
+			var handler = await CreateHandlerAsync(label);
+
+			label.Text = "Now we have text";
+			await InvokeOnMainThreadAsync(() => handler.UpdateValue(nameof(label.Text)));
+
+			var attributedText = await InvokeOnMainThreadAsync(() => GetAttributedText(handler));
+
+			attributedText.AssertHasUnderline();
+		}
+
+		[Fact]
+		[Category(TestCategory.TextFormatting)]
+		public async Task LineHeightSurvivesTextDecorations()
+		{
+			TextDecorations xplatTextDecorations = TextDecorations.Underline;
+			double xplatLineHeight = 2;
+			var expectedLineHeight = xplatLineHeight;
+
+			var label = new LabelStub() { Text = "test", LineHeight = xplatLineHeight };
+
+			var handler = await CreateHandlerAsync(label);
+
+			label.TextDecorations = xplatTextDecorations;
+			await InvokeOnMainThreadAsync(() => handler.UpdateValue(nameof(label.TextDecorations)));
+
+			var actualLineHeight = await InvokeOnMainThreadAsync(() => GetNativeLineHeight(handler));
+			var attributedText = await InvokeOnMainThreadAsync(() => GetAttributedText(handler));
+
+			Assert.Equal(expectedLineHeight, actualLineHeight);
+			attributedText.AssertHasUnderline();
+		}
+
+		[Theory(DisplayName = "HorizontalTextAlignment adjusts for FlowDirection")]
+		[InlineData(TextAlignment.Start, FlowDirection.LeftToRight, UITextAlignment.Left)]
+		[InlineData(TextAlignment.End, FlowDirection.LeftToRight, UITextAlignment.Right)]
+		[InlineData(TextAlignment.Start, FlowDirection.RightToLeft, UITextAlignment.Right)]
+		[InlineData(TextAlignment.End, FlowDirection.RightToLeft, UITextAlignment.Left)]
+		public async Task HorizontalTextAlignmentAdjustsForFlowDirection(TextAlignment alignment, FlowDirection flowDirection, UITextAlignment expected)
+		{
+			var label = new LabelStub
+			{
+				Text = "This is TEXT!",
+				HorizontalTextAlignment = alignment,
+				FlowDirection = flowDirection
+			};
+
+
+			var values = await GetValueAsync(label, (handler) =>
+			{
+				return new
+				{
+					ViewValue = label.HorizontalTextAlignment,
+					NativeViewValue = GetNativeHorizontalTextAlignment(handler)
+				};
+			});
+
+			Assert.Equal(expected, values.NativeViewValue);
 		}
 
 		UILabel GetNativeLabel(LabelHandler labelHandler) =>
-			(UILabel)labelHandler.View;
+			(UILabel)labelHandler.NativeView;
 
 		string GetNativeText(LabelHandler labelHandler) =>
 			GetNativeLabel(labelHandler).Text;
 
 		Color GetNativeTextColor(LabelHandler labelHandler) =>
 			GetNativeLabel(labelHandler).TextColor.ToColor();
-
-		double GetNativeUnscaledFontSize(LabelHandler labelHandler) =>
-			GetNativeLabel(labelHandler).Font.PointSize;
-
-		bool GetNativeIsBold(LabelHandler labelHandler) =>
-			GetNativeLabel(labelHandler).Font.FontDescriptor.SymbolicTraits.HasFlag(UIFontDescriptorSymbolicTraits.Bold);
-
-		bool GetNativeIsItalic(LabelHandler labelHandler) =>
-			GetNativeLabel(labelHandler).Font.FontDescriptor.SymbolicTraits.HasFlag(UIFontDescriptorSymbolicTraits.Italic);
 
 		int GetNativeMaxLines(LabelHandler labelHandler) =>
  			(int)GetNativeLabel(labelHandler).Lines;
@@ -143,35 +192,47 @@ namespace Microsoft.Maui.DeviceTests
 		{
 			var nativeLabel = GetNativeLabel(labelHandler);
 			var text = nativeLabel.AttributedText;
-			if (text == null)
-				return 0;
-
-			var value = text.GetAttribute(UIStringAttributeKey.KerningAdjustment, 0, out var range);
-			if (value == null)
-				return 0;
-
-			Assert.Equal(0, range.Location);
-			Assert.Equal(text.Length, range.Length);
-
-			var kerning = Assert.IsType<NSNumber>(value);
-			return kerning.DoubleValue;
+			return text.GetCharacterSpacing();
 		}
 
-		UITextAlignment GetNativeTextAlignment(LabelHandler labelHandler) =>
-			GetNativeLabel(labelHandler).TextAlignment;
-
-		Task ValidateNativeBackgroundColor(ILabel label, Color color)
+		async Task<NSAttributedString> GetAttributedText(LabelHandler labelHandler)
 		{
-			return InvokeOnMainThreadAsync(() =>
+			return await InvokeOnMainThreadAsync(() =>
 			{
-				return GetNativeLabel(CreateHandler(label)).AssertContainsColor(color);
+				var label = GetNativeLabel(labelHandler);
+				return label.AttributedText;
 			});
 		}
+
+		UITextAlignment GetNativeHorizontalTextAlignment(LabelHandler labelHandler) =>
+			GetNativeLabel(labelHandler).TextAlignment;
 
 		UILineBreakMode GetNativeLineBreakMode(LabelHandler labelHandler) =>
 			GetNativeLabel(labelHandler).LineBreakMode;
 
-		NSAttributedString GetNativeTextDecorations(LabelHandler labelHandler) =>
-			GetNativeLabel(labelHandler).AttributedText;
+		double GetNativeLineHeight(LabelHandler labelHandler)
+		{
+			var attrText = GetNativeLabel(labelHandler).AttributedText;
+
+			if (attrText == null)
+				return new nfloat(-1.0f);
+
+			var paragraphStyle = (NSParagraphStyle)attrText.GetAttribute(UIStringAttributeKey.ParagraphStyle, 0, out _);
+
+			if (paragraphStyle == null)
+				return new nfloat(-1.0f);
+
+			return paragraphStyle.LineHeightMultiple;
+		}
+
+		Task ValidateHasColor(ILabel label, Color color, Action action = null)
+		{
+			return InvokeOnMainThreadAsync(() =>
+			{
+				var nativeLabel = GetNativeLabel(CreateHandler(label));
+				action?.Invoke();
+				nativeLabel.AssertContainsColor(color);
+			});
+		}
 	}
 }

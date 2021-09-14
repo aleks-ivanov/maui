@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 {
@@ -66,6 +67,17 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 				if (handler != null)
 					handler(this, new PropertyChangedEventArgs(propertyName));
 			}
+
+			public int IndexOf(Func<GroupAction, bool> selector)
+			{
+				for (int i = 0; i < this.Count; i++)
+				{
+					if (selector(this[i]))
+						return i;
+				}
+
+				return -1;
+			}
 		}
 
 		class GroupAction
@@ -107,7 +119,7 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 				var label = new Label
 				{
 					VerticalOptions = LayoutOptions.CenterAndExpand,
-					TextColor = Color.Red
+					TextColor = Colors.Red
 				};
 
 				label.SetBinding(Label.TextProperty, "Name");
@@ -138,11 +150,25 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery
 			})
 		};
 
-		readonly ObservableList<Group> _groups;
+		readonly GroupObservableList _groups;
 
-		ObservableList<Group> CreateItemSource()
+		class GroupObservableList : ObservableList<Group>
 		{
-			return new ObservableList<Group> {
+			public int IndexOf(Func<Group, bool> selector)
+			{
+				for (int i = 0; i < this.Count; i++)
+				{
+					if (selector(this[i]))
+						return i;
+				}
+
+				return -1;
+			}
+		}
+
+		GroupObservableList CreateItemSource()
+		{
+			return new GroupObservableList {
 				new Group ("General") {
 					new GroupAction ("Change group name", ga => ga.Parent.Name += " (changed)"),
 					new GroupAction ("Change group short name", ga => ga.Parent.ShortName = ga.Parent.Name[1].ToString())

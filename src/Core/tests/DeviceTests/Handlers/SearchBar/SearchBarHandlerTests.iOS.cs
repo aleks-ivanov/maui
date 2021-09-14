@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Maui.DeviceTests.Stubs;
+using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Handlers;
 using UIKit;
 using Xunit;
@@ -34,11 +36,50 @@ namespace Microsoft.Maui.DeviceTests
 			values.NativeViewValue.AssertHasFlag(expectedValue);
 		}
 
-		UISearchBar GetNativeSearchBar(SearchBarHandler searchBarHandler) =>
-			(UISearchBar)searchBarHandler.View;
+		[Fact(DisplayName = "CharacterSpacing Initializes Correctly")]
+		public async Task CharacterSpacingInitializesCorrectly()
+		{
+			string originalText = "Test";
+			var xplatCharacterSpacing = 4;
+
+			var slider = new SearchBarStub()
+			{
+				CharacterSpacing = xplatCharacterSpacing,
+				Text = originalText
+			};
+
+			var values = await GetValueAsync(slider, (handler) =>
+			{
+				return new
+				{
+					ViewValue = slider.CharacterSpacing,
+					NativeViewValue = GetNativeCharacterSpacing(handler)
+				};
+			});
+
+			Assert.Equal(xplatCharacterSpacing, values.ViewValue);
+			Assert.Equal(xplatCharacterSpacing, values.NativeViewValue);
+		}
+
+		static UISearchBar GetNativeSearchBar(SearchBarHandler searchBarHandler) =>
+			(UISearchBar)searchBarHandler.NativeView;
 
 		string GetNativeText(SearchBarHandler searchBarHandler) =>
 			GetNativeSearchBar(searchBarHandler).Text;
+
+		static void SetNativeText(SearchBarHandler searchBarHandler, string text) =>
+			GetNativeSearchBar(searchBarHandler).Text = text;
+
+		Color GetNativeTextColor(SearchBarHandler searchBarHandler)
+		{
+			var uiSearchBar = GetNativeSearchBar(searchBarHandler);
+			var textField = uiSearchBar.FindDescendantView<UITextField>();
+
+			if (textField == null)
+				return Colors.Transparent;
+
+			return textField.TextColor.ToColor();
+		}
 
 		string GetNativePlaceholder(SearchBarHandler searchBarHandler) =>
 			GetNativeSearchBar(searchBarHandler).Placeholder;
@@ -52,6 +93,35 @@ namespace Microsoft.Maui.DeviceTests
 				return UITextAlignment.Left;
 
 			return textField.TextAlignment;
+		}
+
+		double GetNativeCharacterSpacing(SearchBarHandler searchBarHandler)
+		{
+			var searchBar = GetNativeSearchBar(searchBarHandler);
+			var textField = searchBar.FindDescendantView<UITextField>();
+
+			return textField.AttributedText.GetCharacterSpacing();
+		}
+
+		double GetNativeUnscaledFontSize(SearchBarHandler searchBarHandler)
+		{
+			var uiSearchBar = GetNativeSearchBar(searchBarHandler);
+			var textField = uiSearchBar.FindDescendantView<UITextField>();
+
+			if (textField == null)
+				return -1;
+
+			return textField.Font.PointSize;
+		}
+
+		Task ValidateHasColor(ISearchBar searchBar, Color color, Action action = null)
+		{
+			return InvokeOnMainThreadAsync(() =>
+			{
+				var nativeSearchBar = GetNativeSearchBar(CreateHandler(searchBar));
+				action?.Invoke();
+				nativeSearchBar.AssertContainsColor(color);
+			});
 		}
 	}
 }

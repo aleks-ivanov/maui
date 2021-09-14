@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls.Shapes
 {
@@ -10,7 +11,7 @@ namespace Microsoft.Maui.Controls.Shapes
 		Unknown = 4
 	}
 
-	[TypeConverter(typeof(MatrixTypeConverter))]
+	[System.ComponentModel.TypeConverter(typeof(MatrixTypeConverter))]
 	public struct Matrix
 	{
 		internal double _m11;
@@ -671,7 +672,7 @@ namespace Microsoft.Maui.Controls.Shapes
 
 	internal static class MatrixUtil
 	{
-		internal static void TransformRect(ref Microsoft.Maui.Rectangle rect, ref Matrix matrix)
+		internal static void TransformRect(ref Microsoft.Maui.Graphics.Rectangle rect, ref Matrix matrix)
 		{
 			if (rect.IsEmpty)
 			{

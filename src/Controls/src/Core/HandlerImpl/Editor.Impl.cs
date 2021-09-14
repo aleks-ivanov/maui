@@ -2,8 +2,11 @@
 {
 	public partial class Editor : IEditor
 	{
-		Font? _font;
+		Font ITextStyle.Font => (Font)GetValue(FontElement.FontProperty);
 
-		Font IText.Font => _font ??= Font.OfSize(FontFamily, FontSize).WithAttributes(FontAttributes);
+		void IEditor.Completed()
+		{
+			(this as IEditorController).SendCompleted();
+		}
 	}
 }

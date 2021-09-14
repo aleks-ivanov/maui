@@ -8,6 +8,7 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;
 using Microsoft.Maui.Controls.Xaml;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.GalleryPages
 {
@@ -20,7 +21,7 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.GalleryPages
 
 			if (initialLoad)
 			{
-				Device.BeginInvokeOnMainThread(() => masterDetailsPage_Clicked(this, EventArgs.Empty));
+				Device.BeginInvokeOnMainThread(() => flyoutPagesPage_Clicked(this, EventArgs.Empty));
 			}
 		}
 
@@ -47,7 +48,7 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.GalleryPages
 			}
 		}
 
-		void masterDetailsPage_Clicked(object sender, EventArgs e)
+		void flyoutPagesPage_Clicked(object sender, EventArgs e)
 		{
 			App.Current.MainPage =
 				new FlyoutPage()
@@ -136,14 +137,15 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.GalleryPages
 
 		static View createSearchBarView()
 		{
-			return new SearchBar { BackgroundColor = Color.Cornsilk, HorizontalOptions = LayoutOptions.FillAndExpand, Margin = new Thickness(10, 0) };
+			return new SearchBar { BackgroundColor = Colors.Cornsilk, HorizontalOptions = LayoutOptions.FillAndExpand, Margin = new Thickness(10, 0) };
 		}
 
 		static View createGrid()
 		{
+			Color lightGray = Colors.LightGray;
 			var grid = new Grid
 			{
-				BackgroundColor = Color.LightGray
+				BackgroundColor = lightGray
 			};
 
 			grid.RowDefinitions.Add(new RowDefinition());
@@ -151,8 +153,8 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.GalleryPages
 			grid.ColumnDefinitions.Add(new ColumnDefinition());
 			grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Star });
 
-			var label = new Label { Text = "hello", HorizontalOptions = LayoutOptions.Start, BackgroundColor = Color.Yellow };
-			var label2 = new Label { Text = "hello 2", HorizontalOptions = LayoutOptions.Start, BackgroundColor = Color.Yellow };
+			var label = new Label { Text = "hello", HorizontalOptions = LayoutOptions.Start, BackgroundColor = Colors.Yellow };
+			var label2 = new Label { Text = "hello 2", HorizontalOptions = LayoutOptions.Start, BackgroundColor = Colors.Yellow };
 			grid.Children.Add(
 				new StackLayout()
 				{
@@ -193,7 +195,7 @@ namespace Microsoft.Maui.Controls.Compatibility.ControlGallery.GalleryPages
 				NavigationPage.SetTitleIconImageSource(page, null);
 		}
 
-		void masterDetailsPageIcon_Clicked(object sender, EventArgs e)
+		void flyoutPagesPageIcon_Clicked(object sender, EventArgs e)
 		{
 			if (App.Current.MainPage is FlyoutPage mdp)
 			{

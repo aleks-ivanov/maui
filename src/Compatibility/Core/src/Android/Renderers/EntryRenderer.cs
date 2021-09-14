@@ -11,7 +11,9 @@ using Android.Views.InputMethods;
 using Android.Widget;
 using AndroidX.Core.Content;
 using Java.Lang;
+using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 {
@@ -38,6 +40,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			EditText.SetCursorVisible(isReadOnly);
 		}
 
+		[PortHandler]
 		protected override void UpdatePlaceholderColor()
 		{
 			_hintColorSwitcher = _hintColorSwitcher ?? new TextColorSwitcher(EditText.HintTextColors, Element.UseLegacyColorManagement());
@@ -75,6 +78,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			AutoPackage = false;
 		}
 
+		[PortHandler("Still pending the code related to Keyboard.")]
 		bool TextView.IOnEditorActionListener.OnEditorAction(TextView v, ImeAction actionId, KeyEvent e)
 		{
 			// Fire Completed and dismiss keyboard for hardware / physical keyboards
@@ -298,11 +302,13 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			EditText.ImeOptions = _currentInputImeFlag;
 		}
 
+		[PortHandler]
 		void UpdateHorizontalTextAlignment()
 		{
 			EditText.UpdateTextAlignment(Element.HorizontalTextAlignment, Element.VerticalTextAlignment);
 		}
 
+		[PortHandler]
 		void UpdateVerticalTextAlignment()
 		{
 			EditText.UpdateTextAlignment(Element.HorizontalTextAlignment, Element.VerticalTextAlignment);
@@ -318,7 +324,8 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			EditText.SetTextSize(ComplexUnitType.Sp, (float)Element.FontSize);
 		}
 
-		[PortHandler("Partially ported")]
+		[PortHandler("IsSpellCheckEnabled is missing.")]
+		[PortHandler("No override for GetDigitsKeyListener")]
 		void UpdateInputType()
 		{
 			Entry model = Element;
@@ -365,6 +372,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			Control?.ClearFocus();
 		}
 
+		[PortHandler]
 		void UpdateMaxLength()
 		{
 			var currentFilters = new List<IInputFilter>(EditText?.GetFilters() ?? new IInputFilter[0]);
@@ -388,6 +396,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 				EditText.Text = currentControlText.Substring(0, Element.MaxLength);
 		}
 
+		[PortHandler]
 		void UpdateCharacterSpacing()
 		{
 			if (Forms.IsLollipopOrNewer)
@@ -396,6 +405,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			}
 		}
 
+		[PortHandler]
 		void UpdateReturnType()
 		{
 			if (Control == null || Element == null)
@@ -546,6 +556,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 	}
 
 	// Entry clear button management
+	[PortHandler("Focus management part might need to be reworked after IsFocused implementation.")]
 	public abstract partial class EntryRendererBase<TControl>
 	{
 		Drawable _clearBtn;

@@ -1,6 +1,7 @@
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
 
-namespace Microsoft.Maui.Tests
+namespace Microsoft.Maui.UnitTests
 {
 	class ButtonStub : View, IButton
 	{
@@ -19,5 +20,11 @@ namespace Microsoft.Maui.Tests
 		public void Released() { }
 
 		public Font Font { get; set; }
+
+		public IImageSource ImageSource { get; set; }
+
+		public void ImageSourceLoaded()
+		{
+		}
 	}
 }

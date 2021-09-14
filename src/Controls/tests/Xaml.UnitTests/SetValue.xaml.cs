@@ -1,10 +1,14 @@
 using System;
 using System.Linq;
 using Microsoft.Maui.Controls.Core.UnitTests;
+using Microsoft.Maui.Graphics;
 using NUnit.Framework;
+using AbsoluteLayoutFlags = Microsoft.Maui.Layouts.AbsoluteLayoutFlags;
 
 namespace Microsoft.Maui.Controls.Xaml.UnitTests
 {
+	using AbsoluteLayout = Microsoft.Maui.Controls.Compatibility.AbsoluteLayout;
+
 	public class ConvertibleToView
 	{
 		public static implicit operator View(ConvertibleToView source)
@@ -232,7 +236,7 @@ namespace Microsoft.Maui.Controls.Xaml.UnitTests
 			public void SetConvertibleProperties(bool useCompiledXaml)
 			{
 				var page = new SetValue(useCompiledXaml);
-				Assert.AreEqual(Color.Red, page.label12.TextColor);
+				Assert.AreEqual(Colors.Red, page.label12.TextColor);
 			}
 
 			[TestCase(false)]
@@ -240,7 +244,7 @@ namespace Microsoft.Maui.Controls.Xaml.UnitTests
 			public void SetValueTypeProperties(bool useCompiledXaml)
 			{
 				var page = new SetValue(useCompiledXaml);
-				Assert.AreEqual(Color.Pink, page.label13.TextColor);
+				Assert.AreEqual(Colors.Pink, page.label13.TextColor);
 			}
 
 			[TestCase(false)]
@@ -248,7 +252,7 @@ namespace Microsoft.Maui.Controls.Xaml.UnitTests
 			public void CreateValueTypes(bool useCompiledXaml)
 			{
 				var page = new SetValue(useCompiledXaml);
-				Assert.AreEqual(Color.Purple, page.Resources["purple"]);
+				Assert.AreEqual(Colors.Purple, page.Resources["purple"]);
 			}
 
 			[TestCase(false)]

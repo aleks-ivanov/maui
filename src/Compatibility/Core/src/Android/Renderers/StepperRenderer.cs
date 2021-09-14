@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Android.Content;
 using Android.Views;
 using Android.Widget;
+using Microsoft.Maui.Controls.Platform;
 using AButton = Android.Widget.Button;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
@@ -16,6 +17,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			AutoPackage = false;
 		}
 
+		[PortHandler]
 		protected override LinearLayout CreateNativeControl()
 		{
 			return new LinearLayout(Context)
@@ -26,6 +28,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android
 			};
 		}
 
+		[PortHandler]
 		protected override void OnElementChanged(ElementChangedEventArgs<Stepper> e)
 		{
 			base.OnElementChanged(e);

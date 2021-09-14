@@ -1,16 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Maui;
+﻿using Microsoft.Maui;
+using Microsoft.Maui.Controls;
 
 namespace Maui.Controls.Sample.SingleProject
 {
-	public class MainWindow : IWindow
+	public class MainWindow : Window
 	{
-		public IPage Page { get; set; }
-		public IMauiContext MauiContext { get; set; }
-
-		public MainWindow()
+		public MainWindow() : base(MauiProgram.UseBlazor ? new BlazorPage() : new MainPage())
 		{
-			Page = App.Current.Services.GetService<MainPage>();
 		}
 	}
 }

@@ -4,6 +4,8 @@ using Android.Content;
 using Android.Views;
 using AndroidX.Fragment.App;
 using AndroidX.ViewPager.Widget;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Graphics;
 
 namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat
 {
@@ -31,6 +33,8 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat
 		IPageController PageController => Element as IPageController;
 
 		FragmentManager FragmentManager => _fragmentManager ?? (_fragmentManager = Context.GetFragmentManager());
+
+		ViewGroup ViewGroup => ((IVisualElementRenderer)this).View as ViewGroup;
 
 		void IManageFragments.SetFragmentManager(FragmentManager childFragmentManager)
 		{
@@ -114,7 +118,7 @@ namespace Microsoft.Maui.Controls.Compatibility.Platform.Android.AppCompat
 		{
 			base.OnElementChanged(e);
 
-			var activity = (FormsAppCompatActivity)Context.GetActivity();
+			var activity = Context.GetActivity();
 
 			if (e.OldElement != null)
 				((IPageController)e.OldElement).InternalChildren.CollectionChanged -= OnChildrenCollectionChanged;

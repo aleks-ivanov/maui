@@ -1,65 +1,79 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Maui.Controls.Internals;
+﻿using Microsoft.Maui.Graphics;
+using Microsoft.Maui.HotReload;
+using Microsoft.Maui.Layouts;
 
 namespace Microsoft.Maui.Controls
 {
-	// TODO: We don't currently have any concept of a page in Maui
-	// so this just treats it as a layout for now
-	public partial class ContentPage : Microsoft.Maui.ILayout
+	public partial class ContentPage : IContentView, HotReload.IHotReloadableView
 	{
-		IReadOnlyList<Microsoft.Maui.IView> Microsoft.Maui.ILayout.Children =>
-			new List<IView>() { Content };
-
-		ILayoutHandler Maui.ILayout.LayoutHandler => Handler as ILayoutHandler;
-
-		Thickness Maui.IView.Margin => new Thickness();
-
-		void Maui.ILayout.Add(IView child)
-		{
-			Content = (View)child;
-		}
-
-		void Maui.ILayout.Remove(IView child)
-		{
-			Content = null;
-		}
-
-		internal override void InvalidateMeasureInternal(InvalidationTrigger trigger)
-		{
-			IsArrangeValid = false;
-			base.InvalidateMeasureInternal(trigger);
-		}
+		object IContentView.Content => Content;
+		IView IContentView.PresentedContent => Content;
 
 		protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
 		{
-			IsMeasureValid = true;
+			DesiredSize = this.ComputeDesiredSize(widthConstraint, heightConstraint);
+			return DesiredSize;
+		}
+
+		protected override Size ArrangeOverride(Rectangle bounds)
+		{
+			Frame = this.ComputeFrame(bounds);
+			Handler?.NativeArrange(Frame);
+			return Frame.Size;
+		}
+
+		Size IContentView.CrossPlatformMeasure(double widthConstraint, double heightConstraint)
+		{
+			var content = (this as IContentView).PresentedContent;
+			var padding = Padding;
+
+			if (content != null)
+			{
+				_ = content.Measure(widthConstraint - padding.HorizontalThickness, heightConstraint - padding.VerticalThickness);
+			}
+
 			return new Size(widthConstraint, heightConstraint);
 		}
 
-		protected override void ArrangeOverride(Rectangle bounds)
+		Size IContentView.CrossPlatformArrange(Rectangle bounds)
 		{
-			if (IsArrangeValid)
-			{
-				return;
-			}
-
-			IsArrangeValid = true;
-			IsMeasureValid = true;
-			Arrange(bounds);
-			Handler?.SetFrame(Frame);
-
-			if (Content is IFrameworkElement fe)
-			{
-				fe.InvalidateArrange();
-				fe.Measure(Frame.Width, Frame.Height);
-				fe.Arrange(Frame);
-			}
-
-			if (Content is Layout layout)
-				layout.ResolveLayoutChanges();
-
+			this.ArrangeContent(bounds);
+			return bounds.Size;
 		}
+
+		protected override void InvalidateMeasureOverride()
+		{
+			base.InvalidateMeasureOverride();
+			if (Content is IView view)
+			{
+				view.InvalidateMeasure();
+			}
+		}
+
+		#region HotReload
+
+		IView IReplaceableView.ReplacedView => HotReload.MauiHotReloadHelper.GetReplacedView(this) ?? this;
+
+		HotReload.IReloadHandler HotReload.IHotReloadableView.ReloadHandler { get; set; }
+
+		void HotReload.IHotReloadableView.TransferState(IView newView)
+		{
+			//TODO: Let you hot reload the the ViewModel
+			//TODO: Lets do a real state transfer
+			if (newView is View v)
+				v.BindingContext = BindingContext;
+		}
+
+		void HotReload.IHotReloadableView.Reload()
+		{
+			Device.BeginInvokeOnMainThread(() =>
+			{
+				this.CheckHandlers();
+				var reloadHandler = ((IHotReloadableView)this).ReloadHandler;
+				reloadHandler?.Reload();
+				//TODO: if reload handler is null, Do a manual reload?
+			});
+		}
+		#endregion
 	}
 }
